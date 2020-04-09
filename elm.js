@@ -10155,17 +10155,62 @@ var $author$project$Main$viewInputs = function (model) {
 			]),
 		_List_fromArray(
 			[
-				A3($author$project$Main$ageInput, model.s, 'Initial age', $author$project$Main$SetInitialAge),
-				A3($author$project$Main$ageInput, model.o, 'Retirement age', $author$project$Main$SetRetirementAge),
-				A3($author$project$Main$moneyInput, model.N, 'Initial salary (p.a.)', $author$project$Main$SetInitialSalary),
-				A3($author$project$Main$moneyInput, model.P, 'Salary before retirement (p.a.)', $author$project$Main$SetRetirementSalary),
-				A3($author$project$Main$percentInput, model.H, 'Initial return % (p.a.)', $author$project$Main$SetInitialReturnPercent),
-				A3($author$project$Main$percentInput, model.M, 'Final return % (p.a.)', $author$project$Main$SetFinalReturnPercent),
-				A3($author$project$Main$ageInput, model.L, 'Final return at age', $author$project$Main$SetFinalReturnAtAge),
-				A3($author$project$Main$percentInput, model.F, 'Deposit % of salary', $author$project$Main$SetDepositPercent),
-				A3($author$project$Main$moneyInput, model.Q, 'Retirement withdrawal (p.a.)', $author$project$Main$SetRetirementWithdrawal)
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('input-group')
+					]),
+				_List_fromArray(
+					[
+						A3($author$project$Main$ageInput, model.s, 'Initial age', $author$project$Main$SetInitialAge),
+						A3($author$project$Main$ageInput, model.o, 'Retirement age', $author$project$Main$SetRetirementAge)
+					])),
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('input-group')
+					]),
+				_List_fromArray(
+					[
+						A3($author$project$Main$moneyInput, model.N, 'Initial salary (p.a.)', $author$project$Main$SetInitialSalary),
+						A3($author$project$Main$moneyInput, model.P, 'Salary before retirement (p.a.)', $author$project$Main$SetRetirementSalary)
+					])),
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('input-group')
+					]),
+				_List_fromArray(
+					[
+						A3($author$project$Main$percentInput, model.H, 'Initial return % (p.a.)', $author$project$Main$SetInitialReturnPercent),
+						A3($author$project$Main$percentInput, model.M, 'Final return % (p.a.)', $author$project$Main$SetFinalReturnPercent),
+						A3($author$project$Main$ageInput, model.L, 'Final return at age', $author$project$Main$SetFinalReturnAtAge)
+					])),
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('input-group')
+					]),
+				_List_fromArray(
+					[
+						A3($author$project$Main$percentInput, model.F, 'Deposit % of salary', $author$project$Main$SetDepositPercent),
+						A3($author$project$Main$moneyInput, model.Q, 'Retirement withdrawal (p.a.)', $author$project$Main$SetRetirementWithdrawal)
+					]))
 			]));
 };
+var $elm$html$Html$a = _VirtualDom_node('a');
+var $elm$html$Html$h1 = _VirtualDom_node('h1');
+var $elm$html$Html$Attributes$href = function (url) {
+	return A2(
+		$elm$html$Html$Attributes$stringProperty,
+		'href',
+		_VirtualDom_noJavaScriptUri(url));
+};
+var $elm$html$Html$Attributes$target = $elm$html$Html$Attributes$stringProperty('target');
 var $author$project$Main$viewNotes = A2(
 	$elm$html$Html$div,
 	_List_fromArray(
@@ -10174,6 +10219,24 @@ var $author$project$Main$viewNotes = A2(
 		]),
 	_List_fromArray(
 		[
+			A2(
+			$elm$html$Html$h1,
+			_List_Nil,
+			_List_fromArray(
+				[
+					$elm$html$Html$text('Boglehead retirement calculator')
+				])),
+			A2(
+			$elm$html$Html$a,
+			_List_fromArray(
+				[
+					$elm$html$Html$Attributes$href('https://github.com/Janiczek/boglehead-retirement-calculator'),
+					$elm$html$Html$Attributes$target('_blank')
+				]),
+			_List_fromArray(
+				[
+					$elm$html$Html$text('Source')
+				])),
 			A2(
 			$elm$html$Html$div,
 			_List_fromArray(
