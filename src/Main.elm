@@ -339,6 +339,8 @@ toSpec model rows =
     in
     V.toVegaLite
         [ V.title "Balance by age" []
+        , V.widthOfContainer
+        , V.heightOfContainer
         , V.layer
             [ V.asSpec
                 [ data []
@@ -346,7 +348,7 @@ toSpec model rows =
                 , V.area []
                 ]
             , V.asSpec
-                [ V.rule []
+                [ V.rule [ V.maStroke "rgba(0,0,0,0.5)" ]
                 , retirementAgeData []
                 , retirementAgeEnc []
                 ]
@@ -396,8 +398,9 @@ view_ model =
         computed =
             compute model
     in
-    Html.div []
+    Html.div [ Attrs.class "main" ]
         [ viewInputs model
+        , Html.div [ Attrs.class "chart" ] []
         , viewTable computed
         ]
 
@@ -462,20 +465,23 @@ input min max toString value label toMsg =
 
 viewTable : List Row -> Html Msg
 viewTable computed =
-    Html.table []
-        [ Html.thead []
-            [ Html.tr []
-                [ Html.th [] [ Html.text "Age" ]
-                , Html.th [] [ Html.text "Salary" ]
-                , Html.th [] [ Html.text "Contribution" ]
-                , Html.th [] [ Html.text "Withdrawal" ]
-                , Html.th [] [ Html.text "Return %" ]
-                , Html.th [] [ Html.text "Balance" ]
+    Html.div
+        [ Attrs.class "table-wrapper" ]
+        [ Html.table []
+            [ Html.thead []
+                [ Html.tr []
+                    [ Html.th [] [ Html.text "Age" ]
+                    , Html.th [] [ Html.text "Salary" ]
+                    , Html.th [] [ Html.text "Contribution" ]
+                    , Html.th [] [ Html.text "Withdrawal" ]
+                    , Html.th [] [ Html.text "Return %" ]
+                    , Html.th [] [ Html.text "Balance" ]
+                    ]
                 ]
+            , computed
+                |> List.map viewRow
+                |> Html.tbody []
             ]
-        , computed
-            |> List.map viewRow
-            |> Html.tbody []
         ]
 
 
