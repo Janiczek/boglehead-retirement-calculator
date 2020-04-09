@@ -9937,6 +9937,14 @@ var $elm$html$Html$tbody = _VirtualDom_node('tbody');
 var $elm$html$Html$th = _VirtualDom_node('th');
 var $elm$html$Html$thead = _VirtualDom_node('thead');
 var $elm$html$Html$tr = _VirtualDom_node('tr');
+var $elm$virtual_dom$VirtualDom$attribute = F2(
+	function (key, value) {
+		return A2(
+			_VirtualDom_attribute,
+			_VirtualDom_noOnOrFormAction(key),
+			_VirtualDom_noJavaScriptOrHtmlUri(value));
+	});
+var $elm$html$Html$Attributes$attribute = $elm$virtual_dom$VirtualDom$attribute;
 var $author$project$Main$decimalDot = '.';
 var $elm$core$String$fromList = _String_fromList;
 var $elm$core$List$drop = F2(
@@ -10222,6 +10230,19 @@ var $author$project$Main$formatPercent = function (n) {
 };
 var $elm$html$Html$td = _VirtualDom_node('td');
 var $author$project$Main$viewRow = function (row) {
+	var formatMoney_ = function (n) {
+		var formatted = $author$project$Main$formatMoney(n);
+		return A2(
+			$elm$html$Html$td,
+			_List_fromArray(
+				[
+					A2($elm$html$Html$Attributes$attribute, 'data-value', formatted)
+				]),
+			_List_fromArray(
+				[
+					$elm$html$Html$text(formatted)
+				]));
+	};
 	return A2(
 		$elm$html$Html$tr,
 		_List_Nil,
@@ -10235,30 +10256,9 @@ var $author$project$Main$viewRow = function (row) {
 						$elm$html$Html$text(
 						$elm$core$String$fromInt(row.w))
 					])),
-				A2(
-				$elm$html$Html$td,
-				_List_Nil,
-				_List_fromArray(
-					[
-						$elm$html$Html$text(
-						$author$project$Main$formatMoney(row.V))
-					])),
-				A2(
-				$elm$html$Html$td,
-				_List_Nil,
-				_List_fromArray(
-					[
-						$elm$html$Html$text(
-						$author$project$Main$formatMoney(row.p))
-					])),
-				A2(
-				$elm$html$Html$td,
-				_List_Nil,
-				_List_fromArray(
-					[
-						$elm$html$Html$text(
-						$author$project$Main$formatMoney(row.v))
-					])),
+				formatMoney_(row.V),
+				formatMoney_(row.p),
+				formatMoney_(row.v),
 				A2(
 				$elm$html$Html$td,
 				_List_fromArray(
@@ -10270,14 +10270,7 @@ var $author$project$Main$viewRow = function (row) {
 						$elm$html$Html$text(
 						$author$project$Main$formatPercent(row.t))
 					])),
-				A2(
-				$elm$html$Html$td,
-				_List_Nil,
-				_List_fromArray(
-					[
-						$elm$html$Html$text(
-						$author$project$Main$formatMoney(row.B))
-					]))
+				formatMoney_(row.B)
 			]));
 };
 var $author$project$Main$viewTable = function (computed) {
