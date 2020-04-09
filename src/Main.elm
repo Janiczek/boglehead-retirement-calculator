@@ -63,6 +63,7 @@ type alias Row =
     , deposit : Float
     , withdrawal : Float
     , returnPercent : Float
+    , interestEarned : Float
     , balance : Float
     }
 
@@ -77,39 +78,69 @@ type alias InterpolateOptions =
     , currentTerm : Int
     , startValue : Float
     , endValue : Float
+    , round : Bool
     }
 
 
 interpolate : InterpolateOptions -> Float
-interpolate { terms, currentTerm, startValue, endValue } =
+interpolate { terms, currentTerm, startValue, endValue, round } =
     if currentTerm >= terms then
         endValue
 
     else
-        round100 <| startValue + (toFloat currentTerm / toFloat terms) * (endValue - startValue)
+        (startValue + (toFloat currentTerm / toFloat terms) * (endValue - startValue))
+            |> (if round then
+                    round100
+
+                else
+                    identity
+               )
 
 
 type alias FutureValueOptions =
     { presentValue : Float
     , interestRate : Float
+    , terms : Int
+    , payment : Float
+    , paymentType : PaymentType
     }
+
+
+type PaymentType
+    = DueAtBeginningOfPeriod
+    | DueAtEndOfPeriod
 
 
 {-| This version advances by one term only.
 -}
 futureValue : FutureValueOptions -> Float
-futureValue { presentValue, interestRate } =
-    -- TODO type (end / start)?
+futureValue { presentValue, interestRate, terms, payment, paymentType } =
     -- https://github.com/LibreOffice/core/blob/3bf3face224a7e12ba95888821a0ac21525af22c/sc/source/core/tool/interpr2.cxx#L1973
-    presentValue * (1 + interestRate)
+    if interestRate == 0 then
+        presentValue + payment * toFloat terms
 
+    else
+        negate <|
+            let
+                compoundedRate =
+                    (1 + interestRate) ^ toFloat terms
+            in
+            case paymentType of
+                -- what the heck, LibreOffice devs... ¯\_(ツ)_/¯
+                DueAtBeginningOfPeriod ->
+                    (presentValue * compoundedRate)
+                        + (payment
+                            * (1 + interestRate)
+                            * (compoundedRate - 1)
+                            / interestRate
+                          )
 
-type alias BalanceOptions =
-    { lastBalance : Float
-    , deposit : Float
-    , withdrawal : Float
-    , returnPercent : Float
-    }
+                DueAtEndOfPeriod ->
+                    (presentValue * compoundedRate)
+                        + (payment
+                            * (compoundedRate - 1)
+                            / interestRate
+                          )
 
 
 compute : Model -> List Row
@@ -132,19 +163,30 @@ compute model =
 
                 returnPercent =
                     model.initialReturnPercent
+
+                interestEarned =
+                    computeInterestEarned
+                        { lastBalance = 0
+                        , deposit = deposit
+                        , withdrawal = withdrawal
+                        , returnPercent = returnPercent
+                        }
+
+                balance =
+                    computeBalance
+                        { lastBalance = 0
+                        , deposit = deposit
+                        , withdrawal = withdrawal
+                        , interestEarned = interestEarned
+                        }
             in
             { age = age
             , salary = salary
             , deposit = deposit
             , withdrawal = withdrawal
             , returnPercent = returnPercent
-            , balance =
-                computeBalance
-                    { lastBalance = 0
-                    , deposit = deposit
-                    , withdrawal = withdrawal
-                    , returnPercent = returnPercent
-                    }
+            , interestEarned = interestEarned
+            , balance = balance
             }
     in
     computeHelp model initRow []
@@ -152,7 +194,7 @@ compute model =
 
 computeDeposit : Int -> Float -> Model -> Float
 computeDeposit age salary model =
-    if age >= model.retirementAge then
+    if age > model.retirementAge then
         0
 
     else
@@ -161,7 +203,7 @@ computeDeposit age salary model =
 
 computeWithdrawal : Int -> Model -> Float
 computeWithdrawal age model =
-    if age >= model.retirementAge then
+    if age > model.retirementAge then
         model.retirementWithdrawal
 
     else
@@ -180,29 +222,56 @@ computeReturnPercent age model =
         , currentTerm = computeCurrentTerm age model
         , startValue = model.initialReturnPercent
         , endValue = model.finalReturnPercent
+        , round = False
         }
 
 
 computeSalary : Int -> Model -> Float
 computeSalary age model =
-    if age >= model.retirementAge then
+    if age > model.retirementAge then
         0
 
     else
         interpolate
-            { terms = model.retirementAge - model.initialAge - 1
+            { terms = model.retirementAge - model.initialAge
             , currentTerm = computeCurrentTerm age model
             , startValue = model.initialSalary
             , endValue = model.retirementSalary
+            , round = True
             }
 
 
-computeBalance : BalanceOptions -> Float
-computeBalance { lastBalance, deposit, withdrawal, returnPercent } =
+type alias InterestEarnedOptions =
+    { lastBalance : Float
+    , deposit : Float
+    , withdrawal : Float
+    , returnPercent : Float
+    }
+
+
+computeInterestEarned : InterestEarnedOptions -> Float
+computeInterestEarned { lastBalance, deposit, withdrawal, returnPercent } =
     futureValue
-        { presentValue = lastBalance + deposit - withdrawal
+        { presentValue = negate (lastBalance - withdrawal)
+        , payment = negate deposit
         , interestRate = returnPercent / 100
+        , paymentType = DueAtEndOfPeriod
+        , terms = 1
         }
+        - (lastBalance + deposit - withdrawal)
+
+
+type alias BalanceOptions =
+    { lastBalance : Float
+    , deposit : Float
+    , withdrawal : Float
+    , interestEarned : Float
+    }
+
+
+computeBalance : BalanceOptions -> Float
+computeBalance { lastBalance, deposit, withdrawal, interestEarned } =
+    lastBalance + deposit + interestEarned - withdrawal
 
 
 computeHelp : Model -> Row -> List Row -> List Row
@@ -227,12 +296,20 @@ computeHelp model last rest =
             returnPercent =
                 computeReturnPercent age model
 
+            interestEarned =
+                computeInterestEarned
+                    { lastBalance = last.balance
+                    , deposit = deposit
+                    , withdrawal = withdrawal
+                    , returnPercent = returnPercent
+                    }
+
             balance =
                 computeBalance
                     { lastBalance = last.balance
                     , deposit = deposit
                     , withdrawal = withdrawal
-                    , returnPercent = returnPercent
+                    , interestEarned = interestEarned
                     }
 
             new : Row
@@ -242,6 +319,7 @@ computeHelp model last rest =
                 , deposit = deposit
                 , withdrawal = withdrawal
                 , returnPercent = returnPercent
+                , interestEarned = interestEarned
                 , balance = balance
                 }
         in
@@ -254,9 +332,9 @@ init flags =
         modelWithoutComputed : Model
         modelWithoutComputed =
             { initialAge = 27
-            , retirementAge = 60
+            , retirementAge = 65
             , initialSalary = 5700 * 20 * 11
-            , retirementSalary = 7350 * 20 * 11
+            , retirementSalary = 6000 * 20 * 11
             , initialReturnPercent = 6
             , finalReturnPercent = 3
             , finalReturnAtAge = 80
@@ -317,10 +395,25 @@ recompute model =
 toSpec : Model -> List Row -> V.Spec
 toSpec model rows =
     let
+        firstNegativeRowIndex =
+            rows
+                |> List.indexedMap Tuple.pair
+                |> List.Extra.find (\( _, row ) -> row.balance < 0)
+                |> Maybe.map Tuple.first
+                |> Maybe.withDefault (List.length rows)
+
+        filteredRows =
+            {- We want to filter out the negative rows, except for the last one.
+
+               This is purely for visualization purposes. The table still
+               contains the negative values.
+            -}
+            List.take (firstNegativeRowIndex + 1) rows
+
         data =
             V.dataFromColumns []
-                << V.dataColumn "age" (V.nums <| List.map (.age >> toFloat) rows)
-                << V.dataColumn "balance" (V.nums <| List.map .balance rows)
+                << V.dataColumn "age" (V.nums <| List.map (.age >> toFloat) filteredRows)
+                << V.dataColumn "balance" (V.nums <| List.map .balance filteredRows)
 
         enc =
             V.encoding
@@ -352,7 +445,34 @@ toSpec model rows =
 
         retirementAgeLabel =
             V.asSpec
-                [ V.textMark [ V.maText "retirement age", V.maAlign V.haLeft, V.maXOffset 10 ]
+                [ V.textMark
+                    [ V.maText <|
+                        String.join "\n"
+                            [ "Retirement age:"
+                            , "deposits stop and"
+                            , "withdrawals begin"
+                            ]
+                    , V.maAlign V.haLeft
+                    , V.maXOffset 10
+                    , V.maFontSize 14
+                    ]
+                , retirementAgeData []
+                , retirementAgeEnc []
+                ]
+
+        savingPhaseLabel =
+            V.asSpec
+                [ V.textMark
+                    [ V.maText <|
+                        String.join "\n"
+                            [ "Saving phase:"
+                            , String.fromFloat model.depositPercent ++ "% of salary gets"
+                            , "deposited every year"
+                            ]
+                    , V.maAlign V.haRight
+                    , V.maXOffset -10
+                    , V.maFontSize 14
+                    ]
                 , retirementAgeData []
                 , retirementAgeEnc []
                 ]
@@ -369,6 +489,7 @@ toSpec model rows =
                 ]
             , retirementAgeRule
             , retirementAgeLabel
+            , savingPhaseLabel
             ]
         ]
 
@@ -411,9 +532,19 @@ view_ model =
             compute model
     in
     Html.div [ Attrs.class "main" ]
-        [ viewInputs model
+        [ viewNotes
+        , viewInputs model
         , Html.div [ Attrs.class "chart" ] []
         , viewTable computed
+        ]
+
+
+viewNotes : Html Msg
+viewNotes =
+    Html.div
+        [ Attrs.class "notes" ]
+        [ Html.div [ Attrs.class "note" ] [ Html.text "All percentages are in range 0-100." ]
+        , Html.div [ Attrs.class "note" ] [ Html.text "All payments are done at the end of the period." ]
         ]
 
 
@@ -423,13 +554,13 @@ viewInputs model =
         [ Attrs.class "inputs" ]
         [ ageInput model.initialAge "Initial age" SetInitialAge
         , ageInput model.retirementAge "Retirement age" SetRetirementAge
-        , moneyInput model.initialSalary "Initial yearly salary" SetInitialSalary
-        , moneyInput model.retirementSalary "Retirement yearly salary" SetRetirementSalary
-        , percentInput model.initialReturnPercent "Initial return %" SetInitialReturnPercent
-        , percentInput model.finalReturnPercent "Final return %" SetFinalReturnPercent
+        , moneyInput model.initialSalary "Initial salary (p.a.)" SetInitialSalary
+        , moneyInput model.retirementSalary "Salary before retirement (p.a.)" SetRetirementSalary
+        , percentInput model.initialReturnPercent "Initial return % (p.a.)" SetInitialReturnPercent
+        , percentInput model.finalReturnPercent "Final return % (p.a.)" SetFinalReturnPercent
         , ageInput model.finalReturnAtAge "Final return at age" SetFinalReturnAtAge
-        , percentInput model.depositPercent "Deposit %" SetDepositPercent
-        , moneyInput model.retirementWithdrawal "Retirement yearly withdrawal" SetRetirementWithdrawal
+        , percentInput model.depositPercent "Deposit % of salary" SetDepositPercent
+        , moneyInput model.retirementWithdrawal "Retirement withdrawal (p.a.)" SetRetirementWithdrawal
         ]
 
 
@@ -487,6 +618,7 @@ viewTable computed =
                     , Html.th [] [ Html.text "Deposit" ]
                     , Html.th [] [ Html.text "Withdrawal" ]
                     , Html.th [] [ Html.text "Return %" ]
+                    , Html.th [] [ Html.text "Interest Earned" ]
                     , Html.th [] [ Html.text "Balance" ]
                     ]
                 ]
@@ -515,6 +647,7 @@ viewRow row =
         , formatMoney_ row.deposit
         , formatMoney_ row.withdrawal
         , Html.td [ Attrs.class "percent" ] [ Html.text <| formatPercent row.returnPercent ]
+        , formatMoney_ row.interestEarned
         , formatMoney_ row.balance
         ]
 
