@@ -784,11 +784,11 @@ function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.ae.L === region.aj.L)
+	if (region.ai.O === region.an.O)
 	{
-		return 'on line ' + region.ae.L;
+		return 'on line ' + region.ai.O;
 	}
-	return 'on lines ' + region.ae.L + ' through ' + region.aj.L;
+	return 'on lines ' + region.ai.O + ' through ' + region.an.O;
 }
 
 
@@ -1857,9 +1857,9 @@ var _Platform_worker = F4(function(impl, flagDecoder, debugMetadata, args)
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.aQ,
-		impl.aY,
-		impl.aW,
+		impl.aU,
+		impl.a0,
+		impl.a_,
 		function() { return function() {} }
 	);
 });
@@ -2704,9 +2704,9 @@ var _VirtualDom_mapEventTuple = F2(function(func, tuple)
 var _VirtualDom_mapEventRecord = F2(function(func, record)
 {
 	return {
-		r: func(record.r),
-		af: record.af,
-		ac: record.ac
+		v: func(record.v),
+		aj: record.aj,
+		ag: record.ag
 	}
 });
 
@@ -2974,11 +2974,11 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 		// 3 = Custom
 
 		var value = result.a;
-		var message = !tag ? value : tag < 3 ? value.a : value.r;
-		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.af;
+		var message = !tag ? value : tag < 3 ? value.a : value.v;
+		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.aj;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
-			(tag == 2 ? value.b : tag == 3 && value.ac) && event.preventDefault(),
+			(tag == 2 ? value.b : tag == 3 && value.ag) && event.preventDefault(),
 			eventNode
 		);
 		var tagger;
@@ -3928,11 +3928,11 @@ var _Browser_element = _Debugger_element || F4(function(impl, flagDecoder, debug
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.aQ,
-		impl.aY,
-		impl.aW,
+		impl.aU,
+		impl.a0,
+		impl.a_,
 		function(sendToApp, initialModel) {
-			var view = impl.aZ;
+			var view = impl.a1;
 			/**/
 			var domNode = args['node'];
 			//*/
@@ -3964,12 +3964,12 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.aQ,
-		impl.aY,
-		impl.aW,
+		impl.aU,
+		impl.a0,
+		impl.a_,
 		function(sendToApp, initialModel) {
-			var divertHrefToApp = impl.ad && impl.ad(sendToApp)
-			var view = impl.aZ;
+			var divertHrefToApp = impl.ah && impl.ah(sendToApp)
+			var view = impl.a1;
 			var title = _VirtualDom_doc.title;
 			var bodyNode = _VirtualDom_doc.body;
 			var currNode = _VirtualDom_virtualize(bodyNode);
@@ -3977,12 +3977,12 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 			{
 				_VirtualDom_divertHrefToApp = divertHrefToApp;
 				var doc = view(model);
-				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.aJ);
+				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.aN);
 				var patches = _VirtualDom_diff(currNode, nextNode);
 				bodyNode = _VirtualDom_applyPatches(bodyNode, currNode, patches, sendToApp);
 				currNode = nextNode;
 				_VirtualDom_divertHrefToApp = 0;
-				(title !== doc.aX) && (_VirtualDom_doc.title = title = doc.aX);
+				(title !== doc.a$) && (_VirtualDom_doc.title = title = doc.a$);
 			});
 		}
 	);
@@ -4038,12 +4038,12 @@ function _Browser_makeAnimator(model, draw)
 
 function _Browser_application(impl)
 {
-	var onUrlChange = impl.aS;
-	var onUrlRequest = impl.aT;
+	var onUrlChange = impl.aW;
+	var onUrlRequest = impl.aX;
 	var key = function() { key.a(onUrlChange(_Browser_getUrl())); };
 
 	return _Browser_document({
-		ad: function(sendToApp)
+		ah: function(sendToApp)
 		{
 			key.a = sendToApp;
 			_Browser_window.addEventListener('popstate', key);
@@ -4059,9 +4059,9 @@ function _Browser_application(impl)
 					var next = $elm$url$Url$fromString(href).a;
 					sendToApp(onUrlRequest(
 						(next
-							&& curr.aw === next.aw
-							&& curr.an === next.an
-							&& curr.at.a === next.at.a
+							&& curr.aA === next.aA
+							&& curr.ar === next.ar
+							&& curr.ax.a === next.ax.a
 						)
 							? $elm$browser$Browser$Internal(next)
 							: $elm$browser$Browser$External(href)
@@ -4069,13 +4069,13 @@ function _Browser_application(impl)
 				}
 			});
 		},
-		aQ: function(flags)
+		aU: function(flags)
 		{
-			return A3(impl.aQ, flags, _Browser_getUrl(), key);
+			return A3(impl.aU, flags, _Browser_getUrl(), key);
 		},
-		aZ: impl.aZ,
-		aY: impl.aY,
-		aW: impl.aW
+		a1: impl.a1,
+		a0: impl.a0,
+		a_: impl.a_
 	});
 }
 
@@ -4141,17 +4141,17 @@ var _Browser_decodeEvent = F2(function(decoder, event)
 function _Browser_visibilityInfo()
 {
 	return (typeof _VirtualDom_doc.hidden !== 'undefined')
-		? { aO: 'hidden', aK: 'visibilitychange' }
+		? { aS: 'hidden', aO: 'visibilitychange' }
 		:
 	(typeof _VirtualDom_doc.mozHidden !== 'undefined')
-		? { aO: 'mozHidden', aK: 'mozvisibilitychange' }
+		? { aS: 'mozHidden', aO: 'mozvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.msHidden !== 'undefined')
-		? { aO: 'msHidden', aK: 'msvisibilitychange' }
+		? { aS: 'msHidden', aO: 'msvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.webkitHidden !== 'undefined')
-		? { aO: 'webkitHidden', aK: 'webkitvisibilitychange' }
-		: { aO: 'hidden', aK: 'visibilitychange' };
+		? { aS: 'webkitHidden', aO: 'webkitvisibilitychange' }
+		: { aS: 'hidden', aO: 'visibilitychange' };
 }
 
 
@@ -4232,12 +4232,12 @@ var _Browser_call = F2(function(functionName, id)
 function _Browser_getViewport()
 {
 	return {
-		aA: _Browser_getScene(),
-		aD: {
-			aF: _Browser_window.pageXOffset,
-			aG: _Browser_window.pageYOffset,
-			aE: _Browser_doc.documentElement.clientWidth,
-			am: _Browser_doc.documentElement.clientHeight
+		aE: _Browser_getScene(),
+		aH: {
+			aJ: _Browser_window.pageXOffset,
+			aK: _Browser_window.pageYOffset,
+			aI: _Browser_doc.documentElement.clientWidth,
+			aq: _Browser_doc.documentElement.clientHeight
 		}
 	};
 }
@@ -4247,8 +4247,8 @@ function _Browser_getScene()
 	var body = _Browser_doc.body;
 	var elem = _Browser_doc.documentElement;
 	return {
-		aE: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
-		am: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
+		aI: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
+		aq: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
 	};
 }
 
@@ -4271,15 +4271,15 @@ function _Browser_getViewportOf(id)
 	return _Browser_withNode(id, function(node)
 	{
 		return {
-			aA: {
-				aE: node.scrollWidth,
-				am: node.scrollHeight
+			aE: {
+				aI: node.scrollWidth,
+				aq: node.scrollHeight
 			},
-			aD: {
-				aF: node.scrollLeft,
-				aG: node.scrollTop,
-				aE: node.clientWidth,
-				am: node.clientHeight
+			aH: {
+				aJ: node.scrollLeft,
+				aK: node.scrollTop,
+				aI: node.clientWidth,
+				aq: node.clientHeight
 			}
 		};
 	});
@@ -4309,18 +4309,18 @@ function _Browser_getElement(id)
 		var x = _Browser_window.pageXOffset;
 		var y = _Browser_window.pageYOffset;
 		return {
-			aA: _Browser_getScene(),
-			aD: {
-				aF: x,
-				aG: y,
-				aE: _Browser_doc.documentElement.clientWidth,
-				am: _Browser_doc.documentElement.clientHeight
+			aE: _Browser_getScene(),
+			aH: {
+				aJ: x,
+				aK: y,
+				aI: _Browser_doc.documentElement.clientWidth,
+				aq: _Browser_doc.documentElement.clientHeight
 			},
-			aM: {
-				aF: x + rect.left,
-				aG: y + rect.top,
-				aE: rect.width,
-				am: rect.height
+			aQ: {
+				aJ: x + rect.left,
+				aK: y + rect.top,
+				aI: rect.width,
+				aq: rect.height
 			}
 		};
 	});
@@ -4896,7 +4896,7 @@ var $elm$url$Url$Http = 0;
 var $elm$url$Url$Https = 1;
 var $elm$url$Url$Url = F6(
 	function (protocol, host, port_, path, query, fragment) {
-		return {al: fragment, an: host, ar: path, at: port_, aw: protocol, ax: query};
+		return {ap: fragment, ar: host, av: path, ax: port_, aA: protocol, aB: query};
 	});
 var $elm$core$String$contains = _String_contains;
 var $elm$core$String$length = _String_length;
@@ -5175,80 +5175,107 @@ var $elm$core$Task$perform = F2(
 			A2($elm$core$Task$map, toMessage, task));
 	});
 var $elm$browser$Browser$element = _Browser_element;
-var $author$project$Main$futureValue = function (_v0) {
-	var presentValue = _v0.ab;
-	var interestRate = _v0.Z;
-	return presentValue * (1 + interestRate);
-};
 var $author$project$Main$computeBalance = function (_v0) {
-	var lastBalance = _v0.U;
-	var deposit = _v0.p;
-	var withdrawal = _v0.v;
-	var returnPercent = _v0.t;
-	return $author$project$Main$futureValue(
-		{Z: returnPercent / 100, ab: (lastBalance + deposit) - withdrawal});
+	var lastBalance = _v0.u;
+	var deposit = _v0.g;
+	var withdrawal = _v0.j;
+	var interestEarned = _v0.t;
+	return ((lastBalance + deposit) + interestEarned) - withdrawal;
 };
-var $elm$core$Basics$ge = _Utils_ge;
 var $author$project$Main$computeDeposit = F3(
 	function (age, salary, model) {
-		return (_Utils_cmp(age, model.m) > -1) ? 0 : ((model.H * salary) / 100);
+		return (_Utils_cmp(age, model.o) > 0) ? 0 : ((model.F * salary) / 100);
 	});
+var $author$project$Main$DueAtEndOfPeriod = 1;
+var $elm$core$Basics$negate = function (n) {
+	return -n;
+};
+var $elm$core$Basics$pow = _Basics_pow;
+var $author$project$Main$futureValue = function (_v0) {
+	var presentValue = _v0.af;
+	var interestRate = _v0.aa;
+	var terms = _v0.D;
+	var payment = _v0.ad;
+	var paymentType = _v0.ae;
+	return (!interestRate) ? (presentValue + (payment * terms)) : (-function () {
+		var compoundedRate = A2($elm$core$Basics$pow, 1 + interestRate, terms);
+		if (!paymentType) {
+			return (presentValue * compoundedRate) + (((payment * (1 + interestRate)) * (compoundedRate - 1)) / interestRate);
+		} else {
+			return (presentValue * compoundedRate) + ((payment * (compoundedRate - 1)) / interestRate);
+		}
+	}());
+};
+var $author$project$Main$computeInterestEarned = function (_v0) {
+	var lastBalance = _v0.u;
+	var deposit = _v0.g;
+	var withdrawal = _v0.j;
+	var returnPercent = _v0.x;
+	return $author$project$Main$futureValue(
+		{aa: returnPercent / 100, ad: -deposit, ae: 1, af: -(lastBalance - withdrawal), D: 1}) - ((lastBalance + deposit) - withdrawal);
+};
 var $author$project$Main$computeCurrentTerm = F2(
 	function (age, model) {
-		return age - model.q;
+		return age - model.s;
 	});
+var $elm$core$Basics$ge = _Utils_ge;
 var $elm$core$Basics$round = _Basics_round;
 var $author$project$Main$round100 = function (n) {
 	return $elm$core$Basics$round(n * 100) / 100;
 };
 var $author$project$Main$interpolate = function (_v0) {
-	var terms = _v0.X;
-	var currentTerm = _v0.S;
-	var startValue = _v0.W;
-	var endValue = _v0.T;
-	return (_Utils_cmp(currentTerm, terms) > -1) ? endValue : $author$project$Main$round100(startValue + ((currentTerm / terms) * (endValue - startValue)));
+	var terms = _v0.D;
+	var currentTerm = _v0.V;
+	var startValue = _v0.Z;
+	var endValue = _v0.W;
+	var round = _v0.X;
+	return (_Utils_cmp(currentTerm, terms) > -1) ? endValue : (round ? $author$project$Main$round100 : $elm$core$Basics$identity)(startValue + ((currentTerm / terms) * (endValue - startValue)));
 };
 var $author$project$Main$computeReturnPercent = F2(
 	function (age, model) {
 		return $author$project$Main$interpolate(
 			{
-				S: A2($author$project$Main$computeCurrentTerm, age, model),
-				T: model.J,
-				W: model.D,
-				X: model.I - model.q
+				V: A2($author$project$Main$computeCurrentTerm, age, model),
+				W: model.M,
+				X: false,
+				Z: model.H,
+				D: model.L - model.s
 			});
 	});
 var $author$project$Main$computeSalary = F2(
 	function (age, model) {
-		return (_Utils_cmp(age, model.m) > -1) ? 0 : $author$project$Main$interpolate(
+		return (_Utils_cmp(age, model.o) > 0) ? 0 : $author$project$Main$interpolate(
 			{
-				S: A2($author$project$Main$computeCurrentTerm, age, model),
-				T: model.M,
-				W: model.K,
-				X: (model.m - model.q) - 1
+				V: A2($author$project$Main$computeCurrentTerm, age, model),
+				W: model.P,
+				X: true,
+				Z: model.N,
+				D: model.o - model.s
 			});
 	});
 var $author$project$Main$computeWithdrawal = F2(
 	function (age, model) {
-		return (_Utils_cmp(age, model.m) > -1) ? model.N : 0;
+		return (_Utils_cmp(age, model.o) > 0) ? model.Q : 0;
 	});
 var $author$project$Main$finalAge = 100;
 var $author$project$Main$computeHelp = F3(
 	function (model, last, rest) {
 		computeHelp:
 		while (true) {
-			if (_Utils_eq(last.w, $author$project$Main$finalAge)) {
+			if (_Utils_eq(last.z, $author$project$Main$finalAge)) {
 				return $elm$core$List$reverse(
 					A2($elm$core$List$cons, last, rest));
 			} else {
-				var age = last.w + 1;
+				var age = last.z + 1;
 				var returnPercent = A2($author$project$Main$computeReturnPercent, age, model);
 				var salary = A2($author$project$Main$computeSalary, age, model);
 				var deposit = A3($author$project$Main$computeDeposit, age, salary, model);
 				var withdrawal = A2($author$project$Main$computeWithdrawal, age, model);
+				var interestEarned = $author$project$Main$computeInterestEarned(
+					{g: deposit, u: last.r, x: returnPercent, j: withdrawal});
 				var balance = $author$project$Main$computeBalance(
-					{p: deposit, U: last.B, t: returnPercent, v: withdrawal});
-				var _new = {w: age, B: balance, p: deposit, t: returnPercent, V: salary, v: withdrawal};
+					{g: deposit, t: interestEarned, u: last.r, j: withdrawal});
+				var _new = {z: age, r: balance, g: deposit, t: interestEarned, x: returnPercent, Y: salary, j: withdrawal};
 				var $temp$model = model,
 					$temp$last = _new,
 					$temp$rest = A2($elm$core$List$cons, last, rest);
@@ -5261,20 +5288,16 @@ var $author$project$Main$computeHelp = F3(
 	});
 var $author$project$Main$compute = function (model) {
 	var initRow = function () {
-		var returnPercent = model.D;
-		var age = model.q;
+		var returnPercent = model.H;
+		var age = model.s;
 		var salary = A2($author$project$Main$computeSalary, age, model);
 		var deposit = A3($author$project$Main$computeDeposit, age, salary, model);
 		var withdrawal = A2($author$project$Main$computeWithdrawal, age, model);
-		return {
-			w: age,
-			B: $author$project$Main$computeBalance(
-				{p: deposit, U: 0, t: returnPercent, v: withdrawal}),
-			p: deposit,
-			t: returnPercent,
-			V: salary,
-			v: withdrawal
-		};
+		var interestEarned = $author$project$Main$computeInterestEarned(
+			{g: deposit, u: 0, x: returnPercent, j: withdrawal});
+		var balance = $author$project$Main$computeBalance(
+			{g: deposit, t: interestEarned, u: 0, j: withdrawal});
+		return {z: age, r: balance, g: deposit, t: interestEarned, x: returnPercent, Y: salary, j: withdrawal};
 	}();
 	return A3($author$project$Main$computeHelp, model, initRow, _List_Nil);
 };
@@ -6678,8 +6701,32 @@ var $gicentre$elm_vegalite$VegaLite$encoding = function (channels) {
 		15,
 		$elm$json$Json$Encode$object(channels));
 };
+var $elm_community$list_extra$List$Extra$find = F2(
+	function (predicate, list) {
+		find:
+		while (true) {
+			if (!list.b) {
+				return $elm$core$Maybe$Nothing;
+			} else {
+				var first = list.a;
+				var rest = list.b;
+				if (predicate(first)) {
+					return $elm$core$Maybe$Just(first);
+				} else {
+					var $temp$predicate = predicate,
+						$temp$list = rest;
+					predicate = $temp$predicate;
+					list = $temp$list;
+					continue find;
+				}
+			}
+		}
+	});
+var $elm$core$String$fromFloat = _String_fromNumber;
 var $gicentre$elm_vegalite$VegaLite$AlignLeft = 1;
 var $gicentre$elm_vegalite$VegaLite$haLeft = 1;
+var $gicentre$elm_vegalite$VegaLite$AlignRight = 2;
+var $gicentre$elm_vegalite$VegaLite$haRight = 2;
 var $gicentre$elm_vegalite$VegaLite$VLHeight = 4;
 var $gicentre$elm_vegalite$VegaLite$heightOfContainer = _Utils_Tuple2(
 	4,
@@ -6695,6 +6742,10 @@ var $gicentre$elm_vegalite$VegaLite$MAlign = function (a) {
 	return {$: 0, a: a};
 };
 var $gicentre$elm_vegalite$VegaLite$maAlign = $gicentre$elm_vegalite$VegaLite$MAlign;
+var $gicentre$elm_vegalite$VegaLite$MFontSize = function (a) {
+	return {$: 32, a: a};
+};
+var $gicentre$elm_vegalite$VegaLite$maFontSize = $gicentre$elm_vegalite$VegaLite$MFontSize;
 var $gicentre$elm_vegalite$VegaLite$MStroke = function (a) {
 	return {$: 50, a: a};
 };
@@ -6707,6 +6758,16 @@ var $gicentre$elm_vegalite$VegaLite$MXOffset = function (a) {
 	return {$: 72, a: a};
 };
 var $gicentre$elm_vegalite$VegaLite$maXOffset = $gicentre$elm_vegalite$VegaLite$MXOffset;
+var $elm$core$Maybe$map = F2(
+	function (f, maybe) {
+		if (!maybe.$) {
+			var value = maybe.a;
+			return $elm$core$Maybe$Just(
+				f(value));
+		} else {
+			return $elm$core$Maybe$Nothing;
+		}
+	});
 var $gicentre$elm_vegalite$VegaLite$Numbers = function (a) {
 	return {$: 2, a: a};
 };
@@ -6726,6 +6787,10 @@ var $gicentre$elm_vegalite$VegaLite$PmType = function (a) {
 var $gicentre$elm_vegalite$VegaLite$pOrdinal = $gicentre$elm_vegalite$VegaLite$PmType(1);
 var $gicentre$elm_vegalite$VegaLite$Quantitative = 2;
 var $gicentre$elm_vegalite$VegaLite$pQuant = $gicentre$elm_vegalite$VegaLite$PmType(2);
+var $elm$core$Tuple$pair = F2(
+	function (a, b) {
+		return _Utils_Tuple2(a, b);
+	});
 var $gicentre$elm_vegalite$VegaLite$Latitude = 5;
 var $gicentre$elm_vegalite$VegaLite$Latitude2 = 7;
 var $gicentre$elm_vegalite$VegaLite$Longitude = 4;
@@ -9337,6 +9402,132 @@ var $gicentre$elm_vegalite$VegaLite$position = F2(
 	});
 var $gicentre$elm_vegalite$VegaLite$Rule = 11;
 var $gicentre$elm_vegalite$VegaLite$rule = $gicentre$elm_vegalite$VegaLite$mark(11);
+var $elm$core$List$takeReverse = F3(
+	function (n, list, kept) {
+		takeReverse:
+		while (true) {
+			if (n <= 0) {
+				return kept;
+			} else {
+				if (!list.b) {
+					return kept;
+				} else {
+					var x = list.a;
+					var xs = list.b;
+					var $temp$n = n - 1,
+						$temp$list = xs,
+						$temp$kept = A2($elm$core$List$cons, x, kept);
+					n = $temp$n;
+					list = $temp$list;
+					kept = $temp$kept;
+					continue takeReverse;
+				}
+			}
+		}
+	});
+var $elm$core$List$takeTailRec = F2(
+	function (n, list) {
+		return $elm$core$List$reverse(
+			A3($elm$core$List$takeReverse, n, list, _List_Nil));
+	});
+var $elm$core$List$takeFast = F3(
+	function (ctr, n, list) {
+		if (n <= 0) {
+			return _List_Nil;
+		} else {
+			var _v0 = _Utils_Tuple2(n, list);
+			_v0$1:
+			while (true) {
+				_v0$5:
+				while (true) {
+					if (!_v0.b.b) {
+						return list;
+					} else {
+						if (_v0.b.b.b) {
+							switch (_v0.a) {
+								case 1:
+									break _v0$1;
+								case 2:
+									var _v2 = _v0.b;
+									var x = _v2.a;
+									var _v3 = _v2.b;
+									var y = _v3.a;
+									return _List_fromArray(
+										[x, y]);
+								case 3:
+									if (_v0.b.b.b.b) {
+										var _v4 = _v0.b;
+										var x = _v4.a;
+										var _v5 = _v4.b;
+										var y = _v5.a;
+										var _v6 = _v5.b;
+										var z = _v6.a;
+										return _List_fromArray(
+											[x, y, z]);
+									} else {
+										break _v0$5;
+									}
+								default:
+									if (_v0.b.b.b.b && _v0.b.b.b.b.b) {
+										var _v7 = _v0.b;
+										var x = _v7.a;
+										var _v8 = _v7.b;
+										var y = _v8.a;
+										var _v9 = _v8.b;
+										var z = _v9.a;
+										var _v10 = _v9.b;
+										var w = _v10.a;
+										var tl = _v10.b;
+										return (ctr > 1000) ? A2(
+											$elm$core$List$cons,
+											x,
+											A2(
+												$elm$core$List$cons,
+												y,
+												A2(
+													$elm$core$List$cons,
+													z,
+													A2(
+														$elm$core$List$cons,
+														w,
+														A2($elm$core$List$takeTailRec, n - 4, tl))))) : A2(
+											$elm$core$List$cons,
+											x,
+											A2(
+												$elm$core$List$cons,
+												y,
+												A2(
+													$elm$core$List$cons,
+													z,
+													A2(
+														$elm$core$List$cons,
+														w,
+														A3($elm$core$List$takeFast, ctr + 1, n - 4, tl)))));
+									} else {
+										break _v0$5;
+									}
+							}
+						} else {
+							if (_v0.a === 1) {
+								break _v0$1;
+							} else {
+								break _v0$5;
+							}
+						}
+					}
+				}
+				return list;
+			}
+			var _v1 = _v0.b;
+			var x = _v1.a;
+			return _List_fromArray(
+				[x]);
+		}
+	});
+var $elm$core$List$take = F2(
+	function (n, list) {
+		return A3($elm$core$List$takeFast, 0, n, list);
+	});
 var $gicentre$elm_vegalite$VegaLite$Text = 13;
 var $gicentre$elm_vegalite$VegaLite$textMark = $gicentre$elm_vegalite$VegaLite$mark(13);
 var $gicentre$elm_vegalite$VegaLite$VLTitle = 2;
@@ -9532,16 +9723,22 @@ var $author$project$Main$toSpec = F2(
 				'retirement age',
 				$gicentre$elm_vegalite$VegaLite$nums(
 					_List_fromArray(
-						[model.m]))));
+						[model.o]))));
 		var retirementAgeLabel = $gicentre$elm_vegalite$VegaLite$asSpec(
 			_List_fromArray(
 				[
 					$gicentre$elm_vegalite$VegaLite$textMark(
 					_List_fromArray(
 						[
-							$gicentre$elm_vegalite$VegaLite$maText('retirement age'),
+							$gicentre$elm_vegalite$VegaLite$maText(
+							A2(
+								$elm$core$String$join,
+								'\n',
+								_List_fromArray(
+									['Retirement age:', 'deposits stop and', 'withdrawals begin']))),
 							$gicentre$elm_vegalite$VegaLite$maAlign($gicentre$elm_vegalite$VegaLite$haLeft),
-							$gicentre$elm_vegalite$VegaLite$maXOffset(10)
+							$gicentre$elm_vegalite$VegaLite$maXOffset(10),
+							$gicentre$elm_vegalite$VegaLite$maFontSize(14)
 						])),
 					retirementAgeData(_List_Nil),
 					retirementAgeEnc(_List_Nil)
@@ -9557,6 +9754,43 @@ var $author$project$Main$toSpec = F2(
 					retirementAgeData(_List_Nil),
 					retirementAgeEnc(_List_Nil)
 				]));
+		var savingPhaseLabel = $gicentre$elm_vegalite$VegaLite$asSpec(
+			_List_fromArray(
+				[
+					$gicentre$elm_vegalite$VegaLite$textMark(
+					_List_fromArray(
+						[
+							$gicentre$elm_vegalite$VegaLite$maText(
+							A2(
+								$elm$core$String$join,
+								'\n',
+								_List_fromArray(
+									[
+										'Saving phase:',
+										$elm$core$String$fromFloat(model.F) + '% of salary gets',
+										'deposited every year'
+									]))),
+							$gicentre$elm_vegalite$VegaLite$maAlign($gicentre$elm_vegalite$VegaLite$haRight),
+							$gicentre$elm_vegalite$VegaLite$maXOffset(-10),
+							$gicentre$elm_vegalite$VegaLite$maFontSize(14)
+						])),
+					retirementAgeData(_List_Nil),
+					retirementAgeEnc(_List_Nil)
+				]));
+		var firstNegativeRowIndex = A2(
+			$elm$core$Maybe$withDefault,
+			$elm$core$List$length(rows),
+			A2(
+				$elm$core$Maybe$map,
+				$elm$core$Tuple$first,
+				A2(
+					$elm_community$list_extra$List$Extra$find,
+					function (_v0) {
+						var row = _v0.b;
+						return row.r < 0;
+					},
+					A2($elm$core$List$indexedMap, $elm$core$Tuple$pair, rows))));
+		var filteredRows = A2($elm$core$List$take, firstNegativeRowIndex + 1, rows);
 		var enc = A2(
 			$elm$core$Basics$composeL,
 			A2(
@@ -9602,10 +9836,10 @@ var $author$project$Main$toSpec = F2(
 							A2(
 								$elm$core$Basics$composeR,
 								function ($) {
-									return $.w;
+									return $.z;
 								},
 								$elm$core$Basics$toFloat),
-							rows)))),
+							filteredRows)))),
 			A2(
 				$gicentre$elm_vegalite$VegaLite$dataColumn,
 				'balance',
@@ -9613,9 +9847,9 @@ var $author$project$Main$toSpec = F2(
 					A2(
 						$elm$core$List$map,
 						function ($) {
-							return $.B;
+							return $.r;
 						},
-						rows))));
+						filteredRows))));
 		return $gicentre$elm_vegalite$VegaLite$toVegaLite(
 			_List_fromArray(
 				[
@@ -9633,7 +9867,8 @@ var $author$project$Main$toSpec = F2(
 									$gicentre$elm_vegalite$VegaLite$area(_List_Nil)
 								])),
 							retirementAgeRule,
-							retirementAgeLabel
+							retirementAgeLabel,
+							savingPhaseLabel
 						]))
 				]));
 	});
@@ -9641,14 +9876,14 @@ var $author$project$Main$recompute = function (model) {
 	var computed = $author$project$Main$compute(model);
 	var newModel = _Utils_update(
 		model,
-		{Y: computed});
+		{_: computed});
 	return _Utils_Tuple2(
 		newModel,
 		$author$project$Main$elmToJS(
 			A2($author$project$Main$toSpec, newModel, computed)));
 };
 var $author$project$Main$init = function (flags) {
-	var modelWithoutComputed = {Y: _List_Nil, H: 10, I: 80, J: 3, q: 27, D: 6, K: (5700 * 20) * 11, m: 60, M: (7350 * 20) * 11, N: 50000 * 12};
+	var modelWithoutComputed = {_: _List_Nil, F: 10, L: 80, M: 3, s: 27, H: 6, N: (5700 * 20) * 11, o: 65, P: (6000 * 20) * 11, Q: 50000 * 12};
 	return $author$project$Main$recompute(modelWithoutComputed);
 };
 var $elm$core$Platform$Sub$batch = _Platform_batch;
@@ -9691,7 +9926,7 @@ var $author$project$Main$update = F2(
 							function (n) {
 								return _Utils_update(
 									model,
-									{q: n});
+									{s: n});
 							});
 					case 1:
 						var string = msg.a;
@@ -9702,7 +9937,7 @@ var $author$project$Main$update = F2(
 							function (n) {
 								return _Utils_update(
 									model,
-									{m: n});
+									{o: n});
 							});
 					case 2:
 						var string = msg.a;
@@ -9713,7 +9948,7 @@ var $author$project$Main$update = F2(
 							function (n) {
 								return _Utils_update(
 									model,
-									{K: n});
+									{N: n});
 							});
 					case 3:
 						var string = msg.a;
@@ -9724,7 +9959,7 @@ var $author$project$Main$update = F2(
 							function (n) {
 								return _Utils_update(
 									model,
-									{M: n});
+									{P: n});
 							});
 					case 4:
 						var string = msg.a;
@@ -9735,7 +9970,7 @@ var $author$project$Main$update = F2(
 							function (n) {
 								return _Utils_update(
 									model,
-									{D: n});
+									{H: n});
 							});
 					case 5:
 						var string = msg.a;
@@ -9746,7 +9981,7 @@ var $author$project$Main$update = F2(
 							function (n) {
 								return _Utils_update(
 									model,
-									{J: n});
+									{M: n});
 							});
 					case 6:
 						var string = msg.a;
@@ -9757,7 +9992,7 @@ var $author$project$Main$update = F2(
 							function (n) {
 								return _Utils_update(
 									model,
-									{I: n});
+									{L: n});
 							});
 					case 7:
 						var string = msg.a;
@@ -9768,7 +10003,7 @@ var $author$project$Main$update = F2(
 							function (n) {
 								return _Utils_update(
 									model,
-									{H: n});
+									{F: n});
 							});
 					default:
 						var string = msg.a;
@@ -9779,7 +10014,7 @@ var $author$project$Main$update = F2(
 							function (n) {
 								return _Utils_update(
 									model,
-									{N: n});
+									{Q: n});
 							});
 				}
 			}());
@@ -9909,7 +10144,6 @@ var $author$project$Main$input = F6(
 				]));
 	});
 var $author$project$Main$ageInput = A3($author$project$Main$input, 0, $author$project$Main$finalAge, $elm$core$String$fromInt);
-var $elm$core$String$fromFloat = _String_fromNumber;
 var $author$project$Main$moneyInput = A3($author$project$Main$input, 0, 10000000, $elm$core$String$fromFloat);
 var $author$project$Main$percentInput = A3($author$project$Main$input, 0, 100, $elm$core$String$fromFloat);
 var $author$project$Main$viewInputs = function (model) {
@@ -9921,17 +10155,46 @@ var $author$project$Main$viewInputs = function (model) {
 			]),
 		_List_fromArray(
 			[
-				A3($author$project$Main$ageInput, model.q, 'Initial age', $author$project$Main$SetInitialAge),
-				A3($author$project$Main$ageInput, model.m, 'Retirement age', $author$project$Main$SetRetirementAge),
-				A3($author$project$Main$moneyInput, model.K, 'Initial yearly salary', $author$project$Main$SetInitialSalary),
-				A3($author$project$Main$moneyInput, model.M, 'Retirement yearly salary', $author$project$Main$SetRetirementSalary),
-				A3($author$project$Main$percentInput, model.D, 'Initial return %', $author$project$Main$SetInitialReturnPercent),
-				A3($author$project$Main$percentInput, model.J, 'Final return %', $author$project$Main$SetFinalReturnPercent),
-				A3($author$project$Main$ageInput, model.I, 'Final return at age', $author$project$Main$SetFinalReturnAtAge),
-				A3($author$project$Main$percentInput, model.H, 'Deposit %', $author$project$Main$SetDepositPercent),
-				A3($author$project$Main$moneyInput, model.N, 'Retirement yearly withdrawal', $author$project$Main$SetRetirementWithdrawal)
+				A3($author$project$Main$ageInput, model.s, 'Initial age', $author$project$Main$SetInitialAge),
+				A3($author$project$Main$ageInput, model.o, 'Retirement age', $author$project$Main$SetRetirementAge),
+				A3($author$project$Main$moneyInput, model.N, 'Initial salary (p.a.)', $author$project$Main$SetInitialSalary),
+				A3($author$project$Main$moneyInput, model.P, 'Salary before retirement (p.a.)', $author$project$Main$SetRetirementSalary),
+				A3($author$project$Main$percentInput, model.H, 'Initial return % (p.a.)', $author$project$Main$SetInitialReturnPercent),
+				A3($author$project$Main$percentInput, model.M, 'Final return % (p.a.)', $author$project$Main$SetFinalReturnPercent),
+				A3($author$project$Main$ageInput, model.L, 'Final return at age', $author$project$Main$SetFinalReturnAtAge),
+				A3($author$project$Main$percentInput, model.F, 'Deposit % of salary', $author$project$Main$SetDepositPercent),
+				A3($author$project$Main$moneyInput, model.Q, 'Retirement withdrawal (p.a.)', $author$project$Main$SetRetirementWithdrawal)
 			]));
 };
+var $author$project$Main$viewNotes = A2(
+	$elm$html$Html$div,
+	_List_fromArray(
+		[
+			$elm$html$Html$Attributes$class('notes')
+		]),
+	_List_fromArray(
+		[
+			A2(
+			$elm$html$Html$div,
+			_List_fromArray(
+				[
+					$elm$html$Html$Attributes$class('note')
+				]),
+			_List_fromArray(
+				[
+					$elm$html$Html$text('All percentages are in range 0-100.')
+				])),
+			A2(
+			$elm$html$Html$div,
+			_List_fromArray(
+				[
+					$elm$html$Html$Attributes$class('note')
+				]),
+			_List_fromArray(
+				[
+					$elm$html$Html$text('All payments are done at the end of the period.')
+				]))
+		]));
 var $elm$html$Html$table = _VirtualDom_node('table');
 var $elm$html$Html$tbody = _VirtualDom_node('tbody');
 var $elm$html$Html$th = _VirtualDom_node('th');
@@ -9967,132 +10230,6 @@ var $elm$core$List$drop = F2(
 				}
 			}
 		}
-	});
-var $elm$core$List$takeReverse = F3(
-	function (n, list, kept) {
-		takeReverse:
-		while (true) {
-			if (n <= 0) {
-				return kept;
-			} else {
-				if (!list.b) {
-					return kept;
-				} else {
-					var x = list.a;
-					var xs = list.b;
-					var $temp$n = n - 1,
-						$temp$list = xs,
-						$temp$kept = A2($elm$core$List$cons, x, kept);
-					n = $temp$n;
-					list = $temp$list;
-					kept = $temp$kept;
-					continue takeReverse;
-				}
-			}
-		}
-	});
-var $elm$core$List$takeTailRec = F2(
-	function (n, list) {
-		return $elm$core$List$reverse(
-			A3($elm$core$List$takeReverse, n, list, _List_Nil));
-	});
-var $elm$core$List$takeFast = F3(
-	function (ctr, n, list) {
-		if (n <= 0) {
-			return _List_Nil;
-		} else {
-			var _v0 = _Utils_Tuple2(n, list);
-			_v0$1:
-			while (true) {
-				_v0$5:
-				while (true) {
-					if (!_v0.b.b) {
-						return list;
-					} else {
-						if (_v0.b.b.b) {
-							switch (_v0.a) {
-								case 1:
-									break _v0$1;
-								case 2:
-									var _v2 = _v0.b;
-									var x = _v2.a;
-									var _v3 = _v2.b;
-									var y = _v3.a;
-									return _List_fromArray(
-										[x, y]);
-								case 3:
-									if (_v0.b.b.b.b) {
-										var _v4 = _v0.b;
-										var x = _v4.a;
-										var _v5 = _v4.b;
-										var y = _v5.a;
-										var _v6 = _v5.b;
-										var z = _v6.a;
-										return _List_fromArray(
-											[x, y, z]);
-									} else {
-										break _v0$5;
-									}
-								default:
-									if (_v0.b.b.b.b && _v0.b.b.b.b.b) {
-										var _v7 = _v0.b;
-										var x = _v7.a;
-										var _v8 = _v7.b;
-										var y = _v8.a;
-										var _v9 = _v8.b;
-										var z = _v9.a;
-										var _v10 = _v9.b;
-										var w = _v10.a;
-										var tl = _v10.b;
-										return (ctr > 1000) ? A2(
-											$elm$core$List$cons,
-											x,
-											A2(
-												$elm$core$List$cons,
-												y,
-												A2(
-													$elm$core$List$cons,
-													z,
-													A2(
-														$elm$core$List$cons,
-														w,
-														A2($elm$core$List$takeTailRec, n - 4, tl))))) : A2(
-											$elm$core$List$cons,
-											x,
-											A2(
-												$elm$core$List$cons,
-												y,
-												A2(
-													$elm$core$List$cons,
-													z,
-													A2(
-														$elm$core$List$cons,
-														w,
-														A3($elm$core$List$takeFast, ctr + 1, n - 4, tl)))));
-									} else {
-										break _v0$5;
-									}
-							}
-						} else {
-							if (_v0.a === 1) {
-								break _v0$1;
-							} else {
-								break _v0$5;
-							}
-						}
-					}
-				}
-				return list;
-			}
-			var _v1 = _v0.b;
-			var x = _v1.a;
-			return _List_fromArray(
-				[x]);
-		}
-	});
-var $elm$core$List$take = F2(
-	function (n, list) {
-		return A3($elm$core$List$takeFast, 0, n, list);
 	});
 var $elm_community$list_extra$List$Extra$greedyGroupsOfWithStep = F3(
 	function (size, step, xs) {
@@ -10254,11 +10391,11 @@ var $author$project$Main$viewRow = function (row) {
 				_List_fromArray(
 					[
 						$elm$html$Html$text(
-						$elm$core$String$fromInt(row.w))
+						$elm$core$String$fromInt(row.z))
 					])),
-				formatMoney_(row.V),
-				formatMoney_(row.p),
-				formatMoney_(row.v),
+				formatMoney_(row.Y),
+				formatMoney_(row.g),
+				formatMoney_(row.j),
 				A2(
 				$elm$html$Html$td,
 				_List_fromArray(
@@ -10268,9 +10405,10 @@ var $author$project$Main$viewRow = function (row) {
 				_List_fromArray(
 					[
 						$elm$html$Html$text(
-						$author$project$Main$formatPercent(row.t))
+						$author$project$Main$formatPercent(row.x))
 					])),
-				formatMoney_(row.B)
+				formatMoney_(row.t),
+				formatMoney_(row.r)
 			]));
 };
 var $author$project$Main$viewTable = function (computed) {
@@ -10337,6 +10475,13 @@ var $author$project$Main$viewTable = function (computed) {
 										_List_Nil,
 										_List_fromArray(
 											[
+												$elm$html$Html$text('Interest Earned')
+											])),
+										A2(
+										$elm$html$Html$th,
+										_List_Nil,
+										_List_fromArray(
+											[
 												$elm$html$Html$text('Balance')
 											]))
 									]))
@@ -10358,6 +10503,7 @@ var $author$project$Main$view_ = function (model) {
 			]),
 		_List_fromArray(
 			[
+				$author$project$Main$viewNotes,
 				$author$project$Main$viewInputs(model),
 				A2(
 				$elm$html$Html$div,
@@ -10373,6 +10519,6 @@ var $author$project$Main$view = function (model) {
 	return A2($elm$html$Html$Lazy$lazy, $author$project$Main$view_, model);
 };
 var $author$project$Main$main = $elm$browser$Browser$element(
-	{aQ: $author$project$Main$init, aW: $author$project$Main$subscriptions, aY: $author$project$Main$update, aZ: $author$project$Main$view});
+	{aU: $author$project$Main$init, a_: $author$project$Main$subscriptions, a0: $author$project$Main$update, a1: $author$project$Main$view});
 _Platform_export({'Main':{'init':$author$project$Main$main(
 	$elm$json$Json$Decode$succeed(0))(0)}});}(this));
