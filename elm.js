@@ -2704,7 +2704,7 @@ var _VirtualDom_mapEventTuple = F2(function(func, tuple)
 var _VirtualDom_mapEventRecord = F2(function(func, record)
 {
 	return {
-		q: func(record.q),
+		r: func(record.r),
 		af: record.af,
 		ac: record.ac
 	}
@@ -2974,7 +2974,7 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 		// 3 = Custom
 
 		var value = result.a;
-		var message = !tag ? value : tag < 3 ? value.a : value.q;
+		var message = !tag ? value : tag < 3 ? value.a : value.r;
 		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.af;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
@@ -5182,7 +5182,7 @@ var $author$project$Main$futureValue = function (_v0) {
 };
 var $author$project$Main$computeBalance = function (_v0) {
 	var lastBalance = _v0.U;
-	var deposit = _v0.o;
+	var deposit = _v0.p;
 	var withdrawal = _v0.v;
 	var returnPercent = _v0.t;
 	return $author$project$Main$futureValue(
@@ -5191,11 +5191,11 @@ var $author$project$Main$computeBalance = function (_v0) {
 var $elm$core$Basics$ge = _Utils_ge;
 var $author$project$Main$computeDeposit = F3(
 	function (age, salary, model) {
-		return (_Utils_cmp(age, model.s) > -1) ? 0 : ((model.H * salary) / 100);
+		return (_Utils_cmp(age, model.m) > -1) ? 0 : ((model.H * salary) / 100);
 	});
 var $author$project$Main$computeCurrentTerm = F2(
 	function (age, model) {
-		return age - model.p;
+		return age - model.q;
 	});
 var $author$project$Main$interpolate = function (_v0) {
 	var terms = _v0.X;
@@ -5211,22 +5211,22 @@ var $author$project$Main$computeReturnPercent = F2(
 				S: A2($author$project$Main$computeCurrentTerm, age, model),
 				T: model.J,
 				W: model.D,
-				X: model.I - model.p
+				X: model.I - model.q
 			});
 	});
 var $author$project$Main$computeSalary = F2(
 	function (age, model) {
-		return $author$project$Main$interpolate(
+		return (_Utils_cmp(age, model.m) > -1) ? 0 : $author$project$Main$interpolate(
 			{
 				S: A2($author$project$Main$computeCurrentTerm, age, model),
 				T: model.M,
 				W: model.K,
-				X: model.s - model.p
+				X: (model.m - model.q) - 1
 			});
 	});
 var $author$project$Main$computeWithdrawal = F2(
 	function (age, model) {
-		return (_Utils_cmp(age, model.s) > -1) ? model.N : 0;
+		return (_Utils_cmp(age, model.m) > -1) ? model.N : 0;
 	});
 var $author$project$Main$finalAge = 100;
 var $author$project$Main$computeHelp = F3(
@@ -5243,8 +5243,8 @@ var $author$project$Main$computeHelp = F3(
 				var deposit = A3($author$project$Main$computeDeposit, age, salary, model);
 				var withdrawal = A2($author$project$Main$computeWithdrawal, age, model);
 				var balance = $author$project$Main$computeBalance(
-					{o: deposit, U: last.B, t: returnPercent, v: withdrawal});
-				var _new = {w: age, B: balance, o: deposit, t: returnPercent, V: salary, v: withdrawal};
+					{p: deposit, U: last.B, t: returnPercent, v: withdrawal});
+				var _new = {w: age, B: balance, p: deposit, t: returnPercent, V: salary, v: withdrawal};
 				var $temp$model = model,
 					$temp$last = _new,
 					$temp$rest = A2($elm$core$List$cons, last, rest);
@@ -5258,15 +5258,15 @@ var $author$project$Main$computeHelp = F3(
 var $author$project$Main$compute = function (model) {
 	var initRow = function () {
 		var returnPercent = model.D;
-		var age = model.p;
+		var age = model.q;
 		var salary = A2($author$project$Main$computeSalary, age, model);
 		var deposit = A3($author$project$Main$computeDeposit, age, salary, model);
 		var withdrawal = A2($author$project$Main$computeWithdrawal, age, model);
 		return {
 			w: age,
 			B: $author$project$Main$computeBalance(
-				{o: deposit, U: 0, t: returnPercent, v: withdrawal}),
-			o: deposit,
+				{p: deposit, U: 0, t: returnPercent, v: withdrawal}),
+			p: deposit,
 			t: returnPercent,
 			V: salary,
 			v: withdrawal
@@ -9528,7 +9528,7 @@ var $author$project$Main$toSpec = F2(
 				'retirement age',
 				$gicentre$elm_vegalite$VegaLite$nums(
 					_List_fromArray(
-						[model.s]))));
+						[model.m]))));
 		var retirementAgeLabel = $gicentre$elm_vegalite$VegaLite$asSpec(
 			_List_fromArray(
 				[
@@ -9644,7 +9644,7 @@ var $author$project$Main$recompute = function (model) {
 			A2($author$project$Main$toSpec, newModel, computed)));
 };
 var $author$project$Main$init = function (flags) {
-	var modelWithoutComputed = {Y: _List_Nil, H: 10, I: 80, J: 3, p: 27, D: 6, K: (5700 * 20) * 11, s: 60, M: (7350 * 20) * 11, N: 50000};
+	var modelWithoutComputed = {Y: _List_Nil, H: 10, I: 80, J: 3, q: 27, D: 6, K: (5700 * 20) * 11, m: 60, M: (7350 * 20) * 11, N: 50000};
 	return $author$project$Main$recompute(modelWithoutComputed);
 };
 var $elm$core$Platform$Sub$batch = _Platform_batch;
@@ -9687,7 +9687,7 @@ var $author$project$Main$update = F2(
 							function (n) {
 								return _Utils_update(
 									model,
-									{p: n});
+									{q: n});
 							});
 					case 1:
 						var string = msg.a;
@@ -9698,7 +9698,7 @@ var $author$project$Main$update = F2(
 							function (n) {
 								return _Utils_update(
 									model,
-									{s: n});
+									{m: n});
 							});
 					case 2:
 						var string = msg.a;
@@ -9917,8 +9917,8 @@ var $author$project$Main$viewInputs = function (model) {
 			]),
 		_List_fromArray(
 			[
-				A3($author$project$Main$ageInput, model.p, 'Initial age', $author$project$Main$SetInitialAge),
-				A3($author$project$Main$ageInput, model.s, 'Retirement age', $author$project$Main$SetRetirementAge),
+				A3($author$project$Main$ageInput, model.q, 'Initial age', $author$project$Main$SetInitialAge),
+				A3($author$project$Main$ageInput, model.m, 'Retirement age', $author$project$Main$SetRetirementAge),
 				A3($author$project$Main$moneyInput, model.K, 'Initial yearly salary', $author$project$Main$SetInitialSalary),
 				A3($author$project$Main$moneyInput, model.M, 'Retirement yearly salary', $author$project$Main$SetRetirementSalary),
 				A3($author$project$Main$percentInput, model.D, 'Initial return %', $author$project$Main$SetInitialReturnPercent),
@@ -10249,7 +10249,7 @@ var $author$project$Main$viewRow = function (row) {
 				_List_fromArray(
 					[
 						$elm$html$Html$text(
-						$author$project$Main$formatMoney(row.o))
+						$author$project$Main$formatMoney(row.p))
 					])),
 				A2(
 				$elm$html$Html$td,
