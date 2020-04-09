@@ -86,7 +86,7 @@ interpolate { terms, currentTerm, startValue, endValue } =
         endValue
 
     else
-        startValue + (toFloat currentTerm / toFloat terms) * (endValue - startValue)
+        round100 <| startValue + (toFloat currentTerm / toFloat terms) * (endValue - startValue)
 
 
 type alias FutureValueOptions =
