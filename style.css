@@ -57,6 +57,9 @@ tbody tr:nth-of-type(odd) {
 tbody tr:hover {
     background-color: #def3fd;
 }
+td[data-value="0.00"] {
+  color: #888;
+}
 .percent::after {
     content: ' %';
 }

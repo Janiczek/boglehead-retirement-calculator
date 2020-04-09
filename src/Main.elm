@@ -499,13 +499,23 @@ viewTable computed =
 
 viewRow : Row -> Html Msg
 viewRow row =
+    let
+        formatMoney_ n =
+            let
+                formatted =
+                    formatMoney n
+            in
+            Html.td
+                [ Attrs.attribute "data-value" formatted ]
+                [ Html.text formatted ]
+    in
     Html.tr []
         [ Html.td [] [ Html.text <| String.fromInt row.age ]
-        , Html.td [] [ Html.text <| formatMoney row.salary ]
-        , Html.td [] [ Html.text <| formatMoney row.deposit ]
-        , Html.td [] [ Html.text <| formatMoney row.withdrawal ]
+        , formatMoney_ row.salary
+        , formatMoney_ row.deposit
+        , formatMoney_ row.withdrawal
         , Html.td [ Attrs.class "percent" ] [ Html.text <| formatPercent row.returnPercent ]
-        , Html.td [] [ Html.text <| formatMoney row.balance ]
+        , formatMoney_ row.balance
         ]
 
 
