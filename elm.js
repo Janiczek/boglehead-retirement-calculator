@@ -5197,12 +5197,16 @@ var $author$project$Main$computeCurrentTerm = F2(
 	function (age, model) {
 		return age - model.q;
 	});
+var $elm$core$Basics$round = _Basics_round;
+var $author$project$Main$round100 = function (n) {
+	return $elm$core$Basics$round(n * 100) / 100;
+};
 var $author$project$Main$interpolate = function (_v0) {
 	var terms = _v0.X;
 	var currentTerm = _v0.S;
 	var startValue = _v0.W;
 	var endValue = _v0.T;
-	return (_Utils_cmp(currentTerm, terms) > -1) ? endValue : (startValue + ((currentTerm / terms) * (endValue - startValue)));
+	return (_Utils_cmp(currentTerm, terms) > -1) ? endValue : $author$project$Main$round100(startValue + ((currentTerm / terms) * (endValue - startValue)));
 };
 var $author$project$Main$computeReturnPercent = F2(
 	function (age, model) {
@@ -10119,10 +10123,6 @@ var $elm$core$String$padRight = F3(
 				n - $elm$core$String$length(string),
 				$elm$core$String$fromChar(_char)));
 	});
-var $elm$core$Basics$round = _Basics_round;
-var $author$project$Main$round100 = function (n) {
-	return $elm$core$Basics$round(n * 100) / 100;
-};
 var $author$project$Main$thousandSeparator = '\u2009';
 var $elm$core$String$foldr = _String_foldr;
 var $elm$core$String$toList = function (string) {
