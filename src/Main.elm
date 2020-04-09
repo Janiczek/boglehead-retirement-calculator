@@ -39,6 +39,8 @@ type alias Model =
     -- DEPOSITS AND WITHDRAWALS
     , depositPercent : Float
     , retirementWithdrawal : Float
+
+    -- non-input model
     , computed : List Row
     }
 
@@ -183,12 +185,16 @@ computeReturnPercent age model =
 
 computeSalary : Int -> Model -> Float
 computeSalary age model =
-    interpolate
-        { terms = model.retirementAge - model.initialAge -- TODO off by 1?
-        , currentTerm = computeCurrentTerm age model
-        , startValue = model.initialSalary
-        , endValue = model.retirementSalary
-        }
+    if age >= model.retirementAge then
+        0
+
+    else
+        interpolate
+            { terms = model.retirementAge - model.initialAge - 1
+            , currentTerm = computeCurrentTerm age model
+            , startValue = model.initialSalary
+            , endValue = model.retirementSalary
+            }
 
 
 computeBalance : BalanceOptions -> Float
