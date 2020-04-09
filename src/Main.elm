@@ -176,7 +176,7 @@ computeCurrentTerm age model =
 computeReturnPercent : Int -> Model -> Float
 computeReturnPercent age model =
     interpolate
-        { terms = model.finalReturnAtAge - model.initialAge -- TODO off by 1?
+        { terms = model.finalReturnAtAge - model.initialAge
         , currentTerm = computeCurrentTerm age model
         , startValue = model.initialReturnPercent
         , endValue = model.finalReturnPercent
