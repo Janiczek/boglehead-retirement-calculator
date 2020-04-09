@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Boglehead Retirement Calculator</title>
+        <link rel="stylesheet" href="./style.css">
+        <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+        <script src="https://cdn.jsdelivr.net/npm/vega-lite@4"></script>
+        <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+        <script src="./elm.js"></script>
+    </head>
+    <body>
+        <div id="elm"></div>
+        <div id="vis"></div>
+        <script>
+            var app = Elm.Main.init({node: document.getElementById('elm')});
+
+            app.ports.elmToJS.subscribe(function(specs) {
+                vegaEmbed('#vis', specs, {actions: false}).catch(console.warn);
+            });
+        </script>
+    </body>
+</html>

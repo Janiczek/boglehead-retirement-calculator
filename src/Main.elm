@@ -1,20 +1,25 @@
-module Main exposing (main)
+port module Main exposing (main)
 
 import Browser
 import Html exposing (Html)
 import Html.Attributes as Attrs
 import Html.Events as Events
+import Html.Lazy
 import List.Extra
+import VegaLite as V
 
 
 main : Program () Model Msg
 main =
-    Browser.document
+    Browser.element
         { init = init
         , view = view
         , update = update
         , subscriptions = subscriptions
         }
+
+
+port elmToJS : V.Spec -> Cmd msg
 
 
 type alias Model =
@@ -34,6 +39,7 @@ type alias Model =
     -- CONTRIBUTIONS AND WITHDRAWALS
     , contributionPercent : Float
     , retirementWithdrawal : Float
+    , computed : List Row
     }
 
 
@@ -91,7 +97,17 @@ type alias FutureValueOptions =
 -}
 futureValue : FutureValueOptions -> Float
 futureValue { presentValue, interestRate } =
+    -- TODO type (end / start)?
+    -- https://github.com/LibreOffice/core/blob/3bf3face224a7e12ba95888821a0ac21525af22c/sc/source/core/tool/interpr2.cxx#L1973
     presentValue * (1 + interestRate)
+
+
+type alias BalanceOptions =
+    { lastBalance : Float
+    , contribution : Float
+    , withdrawal : Float
+    , returnPercent : Float
+    }
 
 
 compute : Model -> List Row
@@ -99,15 +115,88 @@ compute model =
     let
         initRow : Row
         initRow =
-            { age = model.initialAge
-            , salary = model.initialSalary
-            , contribution = 0
-            , withdrawal = 0
-            , returnPercent = model.initialReturnPercent
-            , balance = 0
+            let
+                age =
+                    model.initialAge
+
+                salary =
+                    computeSalary age model
+
+                contribution =
+                    computeContribution age salary model
+
+                withdrawal =
+                    computeWithdrawal age model
+
+                returnPercent =
+                    model.initialReturnPercent
+            in
+            { age = age
+            , salary = salary
+            , contribution = contribution
+            , withdrawal = withdrawal
+            , returnPercent = returnPercent
+            , balance =
+                computeBalance
+                    { lastBalance = 0
+                    , contribution = contribution
+                    , withdrawal = withdrawal
+                    , returnPercent = returnPercent
+                    }
             }
     in
     computeHelp model initRow []
+
+
+computeContribution : Int -> Float -> Model -> Float
+computeContribution age salary model =
+    if age >= model.retirementAge then
+        0
+
+    else
+        model.contributionPercent * salary / 100
+
+
+computeWithdrawal : Int -> Model -> Float
+computeWithdrawal age model =
+    if age >= model.retirementAge then
+        model.retirementWithdrawal
+
+    else
+        0
+
+
+computeCurrentTerm : Int -> Model -> Int
+computeCurrentTerm age model =
+    age - model.initialAge
+
+
+computeReturnPercent : Int -> Model -> Float
+computeReturnPercent age model =
+    interpolate
+        { terms = model.finalReturnAtAge - model.initialAge -- TODO off by 1?
+        , currentTerm = computeCurrentTerm age model
+        , startValue = model.initialReturnPercent
+        , endValue = model.finalReturnPercent
+        }
+
+
+computeSalary : Int -> Model -> Float
+computeSalary age model =
+    interpolate
+        { terms = model.retirementAge - model.initialAge -- TODO off by 1?
+        , currentTerm = computeCurrentTerm age model
+        , startValue = model.initialSalary
+        , endValue = model.retirementSalary
+        }
+
+
+computeBalance : BalanceOptions -> Float
+computeBalance { lastBalance, contribution, withdrawal, returnPercent } =
+    futureValue
+        { presentValue = lastBalance + contribution - withdrawal
+        , interestRate = returnPercent / 100
+        }
 
 
 computeHelp : Model -> Row -> List Row -> List Row
@@ -120,44 +209,24 @@ computeHelp model last rest =
             age =
                 last.age + 1
 
-            currentTerm =
-                -- for interpolations
-                age - model.initialAge
-
             salary =
-                interpolate
-                    { terms = model.retirementAge - model.initialAge -- TODO off by 1?
-                    , currentTerm = currentTerm
-                    , startValue = model.initialSalary
-                    , endValue = model.retirementSalary
-                    }
+                computeSalary age model
 
             contribution =
-                if age >= model.retirementAge then
-                    0
-
-                else
-                    model.contributionPercent * salary / 100
+                computeContribution age salary model
 
             withdrawal =
-                if age >= model.retirementAge then
-                    model.retirementWithdrawal
-
-                else
-                    0
+                computeWithdrawal age model
 
             returnPercent =
-                interpolate
-                    { terms = model.finalReturnAtAge - model.initialAge -- TODO off by 1?
-                    , currentTerm = currentTerm
-                    , startValue = model.initialReturnPercent
-                    , endValue = model.finalReturnPercent
-                    }
+                computeReturnPercent age model
 
             balance =
-                futureValue
-                    { presentValue = last.balance + contribution - withdrawal
-                    , interestRate = returnPercent / 100
+                computeBalance
+                    { lastBalance = last.balance
+                    , contribution = contribution
+                    , withdrawal = withdrawal
+                    , returnPercent = returnPercent
                     }
 
             new : Row
@@ -175,51 +244,119 @@ computeHelp model last rest =
 
 init : () -> ( Model, Cmd Msg )
 init flags =
-    ( { initialAge = 27
-      , retirementAge = 60
-      , initialSalary = 5700 * 20 * 11
-      , retirementSalary = 7350 * 20 * 11
-      , initialReturnPercent = 6
-      , finalReturnPercent = 3
-      , finalReturnAtAge = 80
-      , contributionPercent = 10
-      , retirementWithdrawal = 50000
-      }
-    , Cmd.none
-    )
+    let
+        modelWithoutComputed : Model
+        modelWithoutComputed =
+            { initialAge = 27
+            , retirementAge = 60
+            , initialSalary = 5700 * 20 * 11
+            , retirementSalary = 7350 * 20 * 11
+            , initialReturnPercent = 6
+            , finalReturnPercent = 3
+            , finalReturnAtAge = 80
+            , contributionPercent = 10
+            , retirementWithdrawal = 50000
+            , computed = []
+            }
+    in
+    recompute modelWithoutComputed
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    ( case msg of
-        SetInitialAge string ->
-            tryInt string model (\n -> { model | initialAge = n })
+    recompute <|
+        case msg of
+            SetInitialAge string ->
+                tryInt string model (\n -> { model | initialAge = n })
 
-        SetRetirementAge string ->
-            tryInt string model (\n -> { model | retirementAge = n })
+            SetRetirementAge string ->
+                tryInt string model (\n -> { model | retirementAge = n })
 
-        SetInitialSalary string ->
-            tryFloat string model (\n -> { model | initialSalary = n })
+            SetInitialSalary string ->
+                tryFloat string model (\n -> { model | initialSalary = n })
 
-        SetRetirementSalary string ->
-            tryFloat string model (\n -> { model | retirementSalary = n })
+            SetRetirementSalary string ->
+                tryFloat string model (\n -> { model | retirementSalary = n })
 
-        SetInitialReturnPercent string ->
-            tryFloat string model (\n -> { model | initialReturnPercent = n })
+            SetInitialReturnPercent string ->
+                tryFloat string model (\n -> { model | initialReturnPercent = n })
 
-        SetFinalReturnPercent string ->
-            tryFloat string model (\n -> { model | finalReturnPercent = n })
+            SetFinalReturnPercent string ->
+                tryFloat string model (\n -> { model | finalReturnPercent = n })
 
-        SetFinalReturnAtAge string ->
-            tryInt string model (\n -> { model | finalReturnAtAge = n })
+            SetFinalReturnAtAge string ->
+                tryInt string model (\n -> { model | finalReturnAtAge = n })
 
-        SetContributionPercent string ->
-            tryFloat string model (\n -> { model | contributionPercent = n })
+            SetContributionPercent string ->
+                tryFloat string model (\n -> { model | contributionPercent = n })
 
-        SetRetirementWithdrawal string ->
-            tryFloat string model (\n -> { model | retirementWithdrawal = n })
-    , Cmd.none
+            SetRetirementWithdrawal string ->
+                tryFloat string model (\n -> { model | retirementWithdrawal = n })
+
+
+recompute : Model -> ( Model, Cmd Msg )
+recompute model =
+    let
+        computed =
+            compute model
+
+        newModel =
+            { model | computed = computed }
+    in
+    ( newModel
+    , elmToJS <| toSpec newModel computed
     )
+
+
+toSpec : Model -> List Row -> V.Spec
+toSpec model rows =
+    let
+        data =
+            V.dataFromColumns []
+                << V.dataColumn "age" (V.nums <| List.map (.age >> toFloat) rows)
+                << V.dataColumn "balance" (V.nums <| List.map .balance rows)
+
+        enc =
+            V.encoding
+                << V.position V.X
+                    [ V.pName "age"
+                    , V.pOrdinal
+                    , V.pAxis [ V.axTitle "Age" ]
+                    ]
+                << V.position V.Y
+                    [ V.pName "balance"
+                    , V.pQuant
+                    , V.pAxis [ V.axTitle "Balance" ]
+                    ]
+
+        retirementAgeData =
+            V.dataFromColumns []
+                << V.dataColumn "retirement age" (V.nums [ toFloat model.retirementAge ])
+
+        retirementAgeEnc =
+            V.encoding
+                << V.position V.X [ V.pName "retirement age", V.pOrdinal ]
+    in
+    V.toVegaLite
+        [ V.title "Balance by age" []
+        , V.layer
+            [ V.asSpec
+                [ data []
+                , enc []
+                , V.area []
+                ]
+            , V.asSpec
+                [ V.rule []
+                , retirementAgeData []
+                , retirementAgeEnc []
+                ]
+            , V.asSpec
+                [ V.textMark [ V.maText "retirement age", V.maAlign V.haLeft, V.maXOffset 10 ]
+                , retirementAgeData []
+                , retirementAgeEnc []
+                ]
+            ]
+        ]
 
 
 tryInt : String -> Model -> (Int -> Model) -> Model
@@ -247,87 +384,22 @@ subscriptions model =
     Sub.none
 
 
-cssStyle : String
-cssStyle =
-    """
-body {
-    padding: 1rem;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
-    color: #212529;
-    border-collapse: collapse;
-    font-size: 16px;
-}
-table {
-    font-size: 0.875rem;
-    border-spacing: 0;
-}
-th {
-    text-align: center;
-    border-top: 1px solid #dee2e6;
-    border-bottom: 2px solid #dee2e6;
-    padding: 0.3rem;
-    vertical-align: bottom;
-    position: sticky;
-    top: 0;
-    background: #fff;
-}
-td {
-    text-align: right;
-    padding: 0.25rem 0.5rem;
-}
-tbody tr:nth-of-type(odd) {
-    background-color: rgba(0,0,0,0.05);
-}
-.percent::after {
-    content: '%';
-}
-.inputs {
-    width: 300px;
-    display: flex;
-    flex-direction: column;
-    padding-bottom: 1rem;
-    font-size: 0.875rem;
-}
-.input-row {
-    flex: 1;
-    height: 1rem;
-    display: flex;
-    align-items: center;
-}
-.input-row label {
-    width: 70%;
-}
-.input-wrapper {
-    width: 30%;
-}
-.input-wrapper input {
-    margin: 0;
-    font-family: inherit;
-    display: block;
-    width: 100%;
-    height: calc(1em + .75rem + 2px);
-    padding: .125rem .75rem;
-    font-size: 0.875rem;
-    color: #495057;
-    background-color: #fff;
-    background-clip: padding-box;
-    border: 1px solid #ced4da;
-    border-radius: .25rem;
-    overflow: visible;
-}
-"""
-
-
-view : Model -> Browser.Document Msg
+view : Model -> Html Msg
 view model =
-    { title = "Investment Retirement"
-    , body =
-        [ Html.node "style" [] [ Html.text cssStyle ]
-        , viewInputs model
-        , viewTable model
-        , viewGraph model
+    Html.Lazy.lazy view_ model
+
+
+view_ : Model -> Html Msg
+view_ model =
+    let
+        computed : List Row
+        computed =
+            compute model
+    in
+    Html.div []
+        [ viewInputs model
+        , viewTable computed
         ]
-    }
 
 
 viewInputs : Model -> Html Msg
@@ -388,8 +460,8 @@ input min max toString value label toMsg =
         ]
 
 
-viewTable : Model -> Html Msg
-viewTable model =
+viewTable : List Row -> Html Msg
+viewTable computed =
     Html.table []
         [ Html.thead []
             [ Html.tr []
@@ -401,7 +473,7 @@ viewTable model =
                 , Html.th [] [ Html.text "Balance" ]
                 ]
             ]
-        , compute model
+        , computed
             |> List.map viewRow
             |> Html.tbody []
         ]
@@ -491,8 +563,3 @@ formatPercent n =
                 |> String.padRight 2 '0'
     in
     whole ++ decimalDot ++ decimalFormatted
-
-
-viewGraph : Model -> Html Msg
-viewGraph model =
-    Html.text "TODO graph"
