@@ -261,7 +261,7 @@ init flags =
             , finalReturnPercent = 3
             , finalReturnAtAge = 80
             , depositPercent = 10
-            , retirementWithdrawal = 50000
+            , retirementWithdrawal = 50000 * 12
             , computed = []
             }
     in
