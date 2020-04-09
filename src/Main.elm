@@ -25,7 +25,7 @@ port elmToJS : V.Spec -> Cmd msg
 type alias Model =
     -- AGE
     { initialAge : Int
-    , retirementAge : Int -- contributions end at this age
+    , retirementAge : Int -- deposit end at this age
 
     -- SALARY: will increase linearly
     , initialSalary : Float
@@ -36,8 +36,8 @@ type alias Model =
     , finalReturnPercent : Float -- lowers as you rebalance the portfolio and add more bonds to lower the risk
     , finalReturnAtAge : Int
 
-    -- CONTRIBUTIONS AND WITHDRAWALS
-    , contributionPercent : Float
+    -- DEPOSITS AND WITHDRAWALS
+    , depositPercent : Float
     , retirementWithdrawal : Float
     , computed : List Row
     }
@@ -51,14 +51,14 @@ type Msg
     | SetInitialReturnPercent String
     | SetFinalReturnPercent String
     | SetFinalReturnAtAge String
-    | SetContributionPercent String
+    | SetDepositPercent String
     | SetRetirementWithdrawal String
 
 
 type alias Row =
     { age : Int
     , salary : Float
-    , contribution : Float
+    , deposit : Float
     , withdrawal : Float
     , returnPercent : Float
     , balance : Float
@@ -104,7 +104,7 @@ futureValue { presentValue, interestRate } =
 
 type alias BalanceOptions =
     { lastBalance : Float
-    , contribution : Float
+    , deposit : Float
     , withdrawal : Float
     , returnPercent : Float
     }
@@ -122,8 +122,8 @@ compute model =
                 salary =
                     computeSalary age model
 
-                contribution =
-                    computeContribution age salary model
+                deposit =
+                    computeDeposit age salary model
 
                 withdrawal =
                     computeWithdrawal age model
@@ -133,13 +133,13 @@ compute model =
             in
             { age = age
             , salary = salary
-            , contribution = contribution
+            , deposit = deposit
             , withdrawal = withdrawal
             , returnPercent = returnPercent
             , balance =
                 computeBalance
                     { lastBalance = 0
-                    , contribution = contribution
+                    , deposit = deposit
                     , withdrawal = withdrawal
                     , returnPercent = returnPercent
                     }
@@ -148,13 +148,13 @@ compute model =
     computeHelp model initRow []
 
 
-computeContribution : Int -> Float -> Model -> Float
-computeContribution age salary model =
+computeDeposit : Int -> Float -> Model -> Float
+computeDeposit age salary model =
     if age >= model.retirementAge then
         0
 
     else
-        model.contributionPercent * salary / 100
+        model.depositPercent * salary / 100
 
 
 computeWithdrawal : Int -> Model -> Float
@@ -192,9 +192,9 @@ computeSalary age model =
 
 
 computeBalance : BalanceOptions -> Float
-computeBalance { lastBalance, contribution, withdrawal, returnPercent } =
+computeBalance { lastBalance, deposit, withdrawal, returnPercent } =
     futureValue
-        { presentValue = lastBalance + contribution - withdrawal
+        { presentValue = lastBalance + deposit - withdrawal
         , interestRate = returnPercent / 100
         }
 
@@ -212,8 +212,8 @@ computeHelp model last rest =
             salary =
                 computeSalary age model
 
-            contribution =
-                computeContribution age salary model
+            deposit =
+                computeDeposit age salary model
 
             withdrawal =
                 computeWithdrawal age model
@@ -224,7 +224,7 @@ computeHelp model last rest =
             balance =
                 computeBalance
                     { lastBalance = last.balance
-                    , contribution = contribution
+                    , deposit = deposit
                     , withdrawal = withdrawal
                     , returnPercent = returnPercent
                     }
@@ -233,7 +233,7 @@ computeHelp model last rest =
             new =
                 { age = age
                 , salary = salary
-                , contribution = contribution
+                , deposit = deposit
                 , withdrawal = withdrawal
                 , returnPercent = returnPercent
                 , balance = balance
@@ -254,7 +254,7 @@ init flags =
             , initialReturnPercent = 6
             , finalReturnPercent = 3
             , finalReturnAtAge = 80
-            , contributionPercent = 10
+            , depositPercent = 10
             , retirementWithdrawal = 50000
             , computed = []
             }
@@ -287,8 +287,8 @@ update msg model =
             SetFinalReturnAtAge string ->
                 tryInt string model (\n -> { model | finalReturnAtAge = n })
 
-            SetContributionPercent string ->
-                tryFloat string model (\n -> { model | contributionPercent = n })
+            SetDepositPercent string ->
+                tryFloat string model (\n -> { model | depositPercent = n })
 
             SetRetirementWithdrawal string ->
                 tryFloat string model (\n -> { model | retirementWithdrawal = n })
@@ -336,6 +336,20 @@ toSpec model rows =
         retirementAgeEnc =
             V.encoding
                 << V.position V.X [ V.pName "retirement age", V.pOrdinal ]
+
+        retirementAgeRule =
+            V.asSpec
+                [ V.rule [ V.maStroke "rgba(0,0,0,0.5)" ]
+                , retirementAgeData []
+                , retirementAgeEnc []
+                ]
+
+        retirementAgeLabel =
+            V.asSpec
+                [ V.textMark [ V.maText "retirement age", V.maAlign V.haLeft, V.maXOffset 10 ]
+                , retirementAgeData []
+                , retirementAgeEnc []
+                ]
     in
     V.toVegaLite
         [ V.title "Balance by age" []
@@ -347,16 +361,8 @@ toSpec model rows =
                 , enc []
                 , V.area []
                 ]
-            , V.asSpec
-                [ V.rule [ V.maStroke "rgba(0,0,0,0.5)" ]
-                , retirementAgeData []
-                , retirementAgeEnc []
-                ]
-            , V.asSpec
-                [ V.textMark [ V.maText "retirement age", V.maAlign V.haLeft, V.maXOffset 10 ]
-                , retirementAgeData []
-                , retirementAgeEnc []
-                ]
+            , retirementAgeRule
+            , retirementAgeLabel
             ]
         ]
 
@@ -416,7 +422,7 @@ viewInputs model =
         , percentInput model.initialReturnPercent "Initial return %" SetInitialReturnPercent
         , percentInput model.finalReturnPercent "Final return %" SetFinalReturnPercent
         , ageInput model.finalReturnAtAge "Final return at age" SetFinalReturnAtAge
-        , percentInput model.contributionPercent "Contribution %" SetContributionPercent
+        , percentInput model.depositPercent "Deposit %" SetDepositPercent
         , moneyInput model.retirementWithdrawal "Retirement yearly withdrawal" SetRetirementWithdrawal
         ]
 
@@ -472,7 +478,7 @@ viewTable computed =
                 [ Html.tr []
                     [ Html.th [] [ Html.text "Age" ]
                     , Html.th [] [ Html.text "Salary" ]
-                    , Html.th [] [ Html.text "Contribution" ]
+                    , Html.th [] [ Html.text "Deposit" ]
                     , Html.th [] [ Html.text "Withdrawal" ]
                     , Html.th [] [ Html.text "Return %" ]
                     , Html.th [] [ Html.text "Balance" ]
@@ -490,7 +496,7 @@ viewRow row =
     Html.tr []
         [ Html.td [] [ Html.text <| String.fromInt row.age ]
         , Html.td [] [ Html.text <| formatMoney row.salary ]
-        , Html.td [] [ Html.text <| formatMoney row.contribution ]
+        , Html.td [] [ Html.text <| formatMoney row.deposit ]
         , Html.td [] [ Html.text <| formatMoney row.withdrawal ]
         , Html.td [ Attrs.class "percent" ] [ Html.text <| formatPercent row.returnPercent ]
         , Html.td [] [ Html.text <| formatMoney row.balance ]
