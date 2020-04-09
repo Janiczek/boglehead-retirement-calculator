@@ -543,7 +543,13 @@ viewNotes : Html Msg
 viewNotes =
     Html.div
         [ Attrs.class "notes" ]
-        [ Html.div [ Attrs.class "note" ] [ Html.text "All percentages are in range 0-100." ]
+        [ Html.h1 [] [ Html.text "Boglehead retirement calculator" ]
+        , Html.a
+            [ Attrs.href "https://github.com/Janiczek/boglehead-retirement-calculator"
+            , Attrs.target "_blank"
+            ]
+            [ Html.text "Source" ]
+        , Html.div [ Attrs.class "note" ] [ Html.text "All percentages are in range 0-100." ]
         , Html.div [ Attrs.class "note" ] [ Html.text "All payments are done at the end of the period." ]
         ]
 
@@ -552,15 +558,23 @@ viewInputs : Model -> Html Msg
 viewInputs model =
     Html.div
         [ Attrs.class "inputs" ]
-        [ ageInput model.initialAge "Initial age" SetInitialAge
-        , ageInput model.retirementAge "Retirement age" SetRetirementAge
-        , moneyInput model.initialSalary "Initial salary (p.a.)" SetInitialSalary
-        , moneyInput model.retirementSalary "Salary before retirement (p.a.)" SetRetirementSalary
-        , percentInput model.initialReturnPercent "Initial return % (p.a.)" SetInitialReturnPercent
-        , percentInput model.finalReturnPercent "Final return % (p.a.)" SetFinalReturnPercent
-        , ageInput model.finalReturnAtAge "Final return at age" SetFinalReturnAtAge
-        , percentInput model.depositPercent "Deposit % of salary" SetDepositPercent
-        , moneyInput model.retirementWithdrawal "Retirement withdrawal (p.a.)" SetRetirementWithdrawal
+        [ Html.div [ Attrs.class "input-group" ]
+            [ ageInput model.initialAge "Initial age" SetInitialAge
+            , ageInput model.retirementAge "Retirement age" SetRetirementAge
+            ]
+        , Html.div [ Attrs.class "input-group" ]
+            [ moneyInput model.initialSalary "Initial salary (p.a.)" SetInitialSalary
+            , moneyInput model.retirementSalary "Salary before retirement (p.a.)" SetRetirementSalary
+            ]
+        , Html.div [ Attrs.class "input-group" ]
+            [ percentInput model.initialReturnPercent "Initial return % (p.a.)" SetInitialReturnPercent
+            , percentInput model.finalReturnPercent "Final return % (p.a.)" SetFinalReturnPercent
+            , ageInput model.finalReturnAtAge "Final return at age" SetFinalReturnAtAge
+            ]
+        , Html.div [ Attrs.class "input-group" ]
+            [ percentInput model.depositPercent "Deposit % of salary" SetDepositPercent
+            , moneyInput model.retirementWithdrawal "Retirement withdrawal (p.a.)" SetRetirementWithdrawal
+            ]
         ]
 
 
