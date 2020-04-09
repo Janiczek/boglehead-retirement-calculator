@@ -5182,14 +5182,14 @@ var $author$project$Main$futureValue = function (_v0) {
 };
 var $author$project$Main$computeBalance = function (_v0) {
 	var lastBalance = _v0.U;
-	var contribution = _v0.o;
+	var deposit = _v0.o;
 	var withdrawal = _v0.v;
 	var returnPercent = _v0.t;
 	return $author$project$Main$futureValue(
-		{Z: returnPercent / 100, ab: (lastBalance + contribution) - withdrawal});
+		{Z: returnPercent / 100, ab: (lastBalance + deposit) - withdrawal});
 };
 var $elm$core$Basics$ge = _Utils_ge;
-var $author$project$Main$computeContribution = F3(
+var $author$project$Main$computeDeposit = F3(
 	function (age, salary, model) {
 		return (_Utils_cmp(age, model.s) > -1) ? 0 : ((model.H * salary) / 100);
 	});
@@ -5240,11 +5240,11 @@ var $author$project$Main$computeHelp = F3(
 				var age = last.w + 1;
 				var returnPercent = A2($author$project$Main$computeReturnPercent, age, model);
 				var salary = A2($author$project$Main$computeSalary, age, model);
-				var contribution = A3($author$project$Main$computeContribution, age, salary, model);
+				var deposit = A3($author$project$Main$computeDeposit, age, salary, model);
 				var withdrawal = A2($author$project$Main$computeWithdrawal, age, model);
 				var balance = $author$project$Main$computeBalance(
-					{o: contribution, U: last.B, t: returnPercent, v: withdrawal});
-				var _new = {w: age, B: balance, o: contribution, t: returnPercent, V: salary, v: withdrawal};
+					{o: deposit, U: last.B, t: returnPercent, v: withdrawal});
+				var _new = {w: age, B: balance, o: deposit, t: returnPercent, V: salary, v: withdrawal};
 				var $temp$model = model,
 					$temp$last = _new,
 					$temp$rest = A2($elm$core$List$cons, last, rest);
@@ -5260,13 +5260,13 @@ var $author$project$Main$compute = function (model) {
 		var returnPercent = model.D;
 		var age = model.p;
 		var salary = A2($author$project$Main$computeSalary, age, model);
-		var contribution = A3($author$project$Main$computeContribution, age, salary, model);
+		var deposit = A3($author$project$Main$computeDeposit, age, salary, model);
 		var withdrawal = A2($author$project$Main$computeWithdrawal, age, model);
 		return {
 			w: age,
 			B: $author$project$Main$computeBalance(
-				{o: contribution, U: 0, t: returnPercent, v: withdrawal}),
-			o: contribution,
+				{o: deposit, U: 0, t: returnPercent, v: withdrawal}),
+			o: deposit,
 			t: returnPercent,
 			V: salary,
 			v: withdrawal
@@ -9529,6 +9529,30 @@ var $author$project$Main$toSpec = F2(
 				$gicentre$elm_vegalite$VegaLite$nums(
 					_List_fromArray(
 						[model.s]))));
+		var retirementAgeLabel = $gicentre$elm_vegalite$VegaLite$asSpec(
+			_List_fromArray(
+				[
+					$gicentre$elm_vegalite$VegaLite$textMark(
+					_List_fromArray(
+						[
+							$gicentre$elm_vegalite$VegaLite$maText('retirement age'),
+							$gicentre$elm_vegalite$VegaLite$maAlign($gicentre$elm_vegalite$VegaLite$haLeft),
+							$gicentre$elm_vegalite$VegaLite$maXOffset(10)
+						])),
+					retirementAgeData(_List_Nil),
+					retirementAgeEnc(_List_Nil)
+				]));
+		var retirementAgeRule = $gicentre$elm_vegalite$VegaLite$asSpec(
+			_List_fromArray(
+				[
+					$gicentre$elm_vegalite$VegaLite$rule(
+					_List_fromArray(
+						[
+							$gicentre$elm_vegalite$VegaLite$maStroke('rgba(0,0,0,0.5)')
+						])),
+					retirementAgeData(_List_Nil),
+					retirementAgeEnc(_List_Nil)
+				]));
 		var enc = A2(
 			$elm$core$Basics$composeL,
 			A2(
@@ -9604,30 +9628,8 @@ var $author$project$Main$toSpec = F2(
 									enc(_List_Nil),
 									$gicentre$elm_vegalite$VegaLite$area(_List_Nil)
 								])),
-							$gicentre$elm_vegalite$VegaLite$asSpec(
-							_List_fromArray(
-								[
-									$gicentre$elm_vegalite$VegaLite$rule(
-									_List_fromArray(
-										[
-											$gicentre$elm_vegalite$VegaLite$maStroke('rgba(0,0,0,0.5)')
-										])),
-									retirementAgeData(_List_Nil),
-									retirementAgeEnc(_List_Nil)
-								])),
-							$gicentre$elm_vegalite$VegaLite$asSpec(
-							_List_fromArray(
-								[
-									$gicentre$elm_vegalite$VegaLite$textMark(
-									_List_fromArray(
-										[
-											$gicentre$elm_vegalite$VegaLite$maText('retirement age'),
-											$gicentre$elm_vegalite$VegaLite$maAlign($gicentre$elm_vegalite$VegaLite$haLeft),
-											$gicentre$elm_vegalite$VegaLite$maXOffset(10)
-										])),
-									retirementAgeData(_List_Nil),
-									retirementAgeEnc(_List_Nil)
-								]))
+							retirementAgeRule,
+							retirementAgeLabel
 						]))
 				]));
 	});
@@ -9789,7 +9791,7 @@ var $elm$html$Html$Attributes$stringProperty = F2(
 	});
 var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
 var $elm$html$Html$div = _VirtualDom_node('div');
-var $author$project$Main$SetContributionPercent = function (a) {
+var $author$project$Main$SetDepositPercent = function (a) {
 	return {$: 7, a: a};
 };
 var $author$project$Main$SetFinalReturnAtAge = function (a) {
@@ -9922,7 +9924,7 @@ var $author$project$Main$viewInputs = function (model) {
 				A3($author$project$Main$percentInput, model.D, 'Initial return %', $author$project$Main$SetInitialReturnPercent),
 				A3($author$project$Main$percentInput, model.J, 'Final return %', $author$project$Main$SetFinalReturnPercent),
 				A3($author$project$Main$ageInput, model.I, 'Final return at age', $author$project$Main$SetFinalReturnAtAge),
-				A3($author$project$Main$percentInput, model.H, 'Contribution %', $author$project$Main$SetContributionPercent),
+				A3($author$project$Main$percentInput, model.H, 'Deposit %', $author$project$Main$SetDepositPercent),
 				A3($author$project$Main$moneyInput, model.N, 'Retirement yearly withdrawal', $author$project$Main$SetRetirementWithdrawal)
 			]));
 };
@@ -10321,7 +10323,7 @@ var $author$project$Main$viewTable = function (computed) {
 										_List_Nil,
 										_List_fromArray(
 											[
-												$elm$html$Html$text('Contribution')
+												$elm$html$Html$text('Deposit')
 											])),
 										A2(
 										$elm$html$Html$th,
