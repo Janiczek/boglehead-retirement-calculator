@@ -1,4 +1,4 @@
-module BruteForce exposing (Input, main)
+module BruteForce exposing (Input, main, scalarize)
 
 import List.Extra
 import Platform
@@ -15,7 +15,11 @@ type alias Input =
     }
 
 
-toModel : Input -> SingleComputation.Model {}
+type alias Model =
+    SingleComputation.Model {}
+
+
+toModel : Input -> Model
 toModel r =
     { initialAge = 27
     , retirementAge = r.retirementAge
@@ -26,6 +30,16 @@ toModel r =
     , finalReturnAtAge = r.finalReturnAtAge
     , depositPercent = r.depositPercent
     , retirementWithdrawal = 50000 * 12
+    }
+
+
+toInput : Model -> Input
+toInput r =
+    { retirementAge = r.retirementAge
+    , initialReturnPercent = r.initialReturnPercent
+    , finalReturnPercent = r.finalReturnPercent
+    , finalReturnAtAge = r.finalReturnAtAge
+    , depositPercent = r.depositPercent
     }
 
 
@@ -109,41 +123,24 @@ fraaStep =
     1
 
 
-{-| SingleComputation.lastsUntilFinalAge initModel == True
-scalarize initInput == 2.1
 
-Our goal will be to find an input with as low `scalarize` fn result as possible and lastsUntilFinalAge == True.
-
--}
-initInput : Input
-initInput =
-    { retirementAge = raMax
-    , initialReturnPercent = irpMax
-    , finalReturnPercent = frpMax
-    , finalReturnAtAge = fraaMax
-    , depositPercent = dpMax
-    }
-
-
-initModel : SingleComputation.Model {}
-initModel =
-    toModel initInput
+-- WEIGHTS
 
 
 raWeight =
-    0.8
+    2
 
 
 dpWeight =
-    0.6
+    0.3
 
 
 irpWeight =
-    0.3
+    0.1
 
 
 frpWeight =
-    0.3
+    0.1
 
 
 fraaWeight =
@@ -166,17 +163,13 @@ scalarize a =
         + (fraaWeight * normalize fraaMin fraaMax (toFloat a.finalReturnAtAge))
 
 
-main : Program () Model Msg
+main : Program () () Msg
 main =
     Platform.worker
         { init = init
         , update = update
         , subscriptions = subscriptions
         }
-
-
-type alias Model =
-    ()
 
 
 type Msg
@@ -188,7 +181,7 @@ tries =
     10000
 
 
-init : () -> ( Model, Cmd Msg )
+init : () -> ( (), Cmd Msg )
 init flags =
     ( ()
     , Random.generate GeneratedInputs (Random.list tries inputGenerator)
@@ -206,21 +199,69 @@ inputGenerator =
         (Random.float dpMin dpMax)
 
 
-update : Msg -> Model -> ( Model, Cmd Msg )
+update : Msg -> () -> ( (), Cmd Msg )
 update msg () =
     case msg of
         GeneratedInputs inputs ->
             let
-                bestInput =
+                _ =
                     inputs
-                        |> List.map (\input -> ( input, toModel input, scalarize input ))
-                        |> List.filter (\( _, model, _ ) -> SingleComputation.lastsUntilFinalAge model)
-                        |> List.Extra.minimumBy (\( _, _, output ) -> output)
-                        |> Debug.log "best found input"
+                        |> List.map toModel
+                        |> List.filter SingleComputation.sanityCheck
+                        |> List.map (descendAll >> toInput)
+                        |> List.map (\input -> ( input, scalarize input ))
+                        |> List.Extra.minimumBy Tuple.second
+                        |> Debug.log "best random input"
             in
             ( (), Cmd.none )
 
 
-subscriptions : Model -> Sub Msg
-subscriptions model =
+setRA n model =
+    { model | retirementAge = n }
+
+
+setDP n model =
+    { model | depositPercent = n }
+
+
+setIRP n model =
+    { model | initialReturnPercent = n }
+
+
+setFRP n model =
+    { model | finalReturnPercent = n }
+
+
+setFRAA n model =
+    { model | finalReturnAtAge = n }
+
+
+descend : number -> number -> (Model -> number) -> (number -> Model -> Model) -> Model -> Model
+descend min step getter setter model =
+    let
+        new =
+            getter model - step
+
+        newModel =
+            setter new model
+    in
+    if new < min || not (SingleComputation.sanityCheck newModel) then
+        model
+
+    else
+        descend min step getter setter newModel
+
+
+descendAll : Model -> Model
+descendAll model =
+    model
+        |> descend raMin raStep .retirementAge setRA
+        |> descend dpMin dpStep .depositPercent setDP
+        |> descend irpMin irpStep .initialReturnPercent setIRP
+        |> descend frpMin frpStep .finalReturnPercent setFRP
+        |> descend fraaMin fraaStep .finalReturnAtAge setFRAA
+
+
+subscriptions : () -> Sub Msg
+subscriptions () =
     Sub.none

@@ -3,7 +3,7 @@ module SingleComputation exposing
     , Row
     , compute
     , finalAge
-    , lastsUntilFinalAge
+    , sanityCheck
     )
 
 import List.Extra
@@ -298,8 +298,8 @@ futureValue { presentValue, interestRate, terms, payment, paymentType } =
                           )
 
 
-lastsUntilFinalAge : Model r -> Bool
-lastsUntilFinalAge model =
+sanityCheck : Model r -> Bool
+sanityCheck model =
     let
         rows =
             compute model
@@ -310,5 +310,13 @@ lastsUntilFinalAge model =
                 |> List.Extra.last
                 |> Maybe.map .age
                 |> Maybe.withDefault -1
+
+        lastsUntilFinalAge : Bool
+        lastsUntilFinalAge =
+            lastPositiveAge >= finalAge
+
+        initialGTFinal : Bool
+        initialGTFinal =
+            model.initialReturnPercent >= model.finalReturnPercent
     in
-    lastPositiveAge >= finalAge
+    lastsUntilFinalAge && initialGTFinal
