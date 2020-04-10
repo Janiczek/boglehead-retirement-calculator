@@ -111,8 +111,6 @@ type PaymentType
     | DueAtEndOfPeriod
 
 
-{-| This version advances by one term only.
--}
 futureValue : FutureValueOptions -> Float
 futureValue { presentValue, interestRate, terms, payment, paymentType } =
     -- https://github.com/LibreOffice/core/blob/3bf3face224a7e12ba95888821a0ac21525af22c/sc/source/core/tool/interpr2.cxx#L1973
