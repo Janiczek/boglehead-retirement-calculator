@@ -784,11 +784,11 @@ function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.ai.O === region.an.O)
+	if (region.ac.C === region.ai.C)
 	{
-		return 'on line ' + region.ai.O;
+		return 'on line ' + region.ac.C;
 	}
-	return 'on lines ' + region.ai.O + ' through ' + region.an.O;
+	return 'on lines ' + region.ac.C + ' through ' + region.ai.C;
 }
 
 
@@ -1857,9 +1857,9 @@ var _Platform_worker = F4(function(impl, flagDecoder, debugMetadata, args)
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.aU,
-		impl.a0,
-		impl.a_,
+		impl.aQ,
+		impl.a$,
+		impl.aZ,
 		function() { return function() {} }
 	);
 });
@@ -2704,9 +2704,9 @@ var _VirtualDom_mapEventTuple = F2(function(func, tuple)
 var _VirtualDom_mapEventRecord = F2(function(func, record)
 {
 	return {
-		v: func(record.v),
-		aj: record.aj,
-		ag: record.ag
+		p: func(record.p),
+		ad: record.ad,
+		aa: record.aa
 	}
 });
 
@@ -2974,11 +2974,11 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 		// 3 = Custom
 
 		var value = result.a;
-		var message = !tag ? value : tag < 3 ? value.a : value.v;
-		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.aj;
+		var message = !tag ? value : tag < 3 ? value.a : value.p;
+		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.ad;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
-			(tag == 2 ? value.b : tag == 3 && value.ag) && event.preventDefault(),
+			(tag == 2 ? value.b : tag == 3 && value.aa) && event.preventDefault(),
 			eventNode
 		);
 		var tagger;
@@ -3928,11 +3928,11 @@ var _Browser_element = _Debugger_element || F4(function(impl, flagDecoder, debug
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.aU,
-		impl.a0,
-		impl.a_,
+		impl.aQ,
+		impl.a$,
+		impl.aZ,
 		function(sendToApp, initialModel) {
-			var view = impl.a1;
+			var view = impl.a0;
 			/**/
 			var domNode = args['node'];
 			//*/
@@ -3964,12 +3964,12 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.aU,
-		impl.a0,
-		impl.a_,
+		impl.aQ,
+		impl.a$,
+		impl.aZ,
 		function(sendToApp, initialModel) {
-			var divertHrefToApp = impl.ah && impl.ah(sendToApp)
-			var view = impl.a1;
+			var divertHrefToApp = impl.ab && impl.ab(sendToApp)
+			var view = impl.a0;
 			var title = _VirtualDom_doc.title;
 			var bodyNode = _VirtualDom_doc.body;
 			var currNode = _VirtualDom_virtualize(bodyNode);
@@ -3977,12 +3977,12 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 			{
 				_VirtualDom_divertHrefToApp = divertHrefToApp;
 				var doc = view(model);
-				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.aN);
+				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.aI);
 				var patches = _VirtualDom_diff(currNode, nextNode);
 				bodyNode = _VirtualDom_applyPatches(bodyNode, currNode, patches, sendToApp);
 				currNode = nextNode;
 				_VirtualDom_divertHrefToApp = 0;
-				(title !== doc.a$) && (_VirtualDom_doc.title = title = doc.a$);
+				(title !== doc.a_) && (_VirtualDom_doc.title = title = doc.a_);
 			});
 		}
 	);
@@ -4038,12 +4038,12 @@ function _Browser_makeAnimator(model, draw)
 
 function _Browser_application(impl)
 {
-	var onUrlChange = impl.aW;
-	var onUrlRequest = impl.aX;
+	var onUrlChange = impl.aT;
+	var onUrlRequest = impl.aU;
 	var key = function() { key.a(onUrlChange(_Browser_getUrl())); };
 
 	return _Browser_document({
-		ah: function(sendToApp)
+		ab: function(sendToApp)
 		{
 			key.a = sendToApp;
 			_Browser_window.addEventListener('popstate', key);
@@ -4059,9 +4059,9 @@ function _Browser_application(impl)
 					var next = $elm$url$Url$fromString(href).a;
 					sendToApp(onUrlRequest(
 						(next
-							&& curr.aA === next.aA
-							&& curr.ar === next.ar
-							&& curr.ax.a === next.ax.a
+							&& curr.av === next.av
+							&& curr.am === next.am
+							&& curr.as.a === next.as.a
 						)
 							? $elm$browser$Browser$Internal(next)
 							: $elm$browser$Browser$External(href)
@@ -4069,13 +4069,13 @@ function _Browser_application(impl)
 				}
 			});
 		},
-		aU: function(flags)
+		aQ: function(flags)
 		{
-			return A3(impl.aU, flags, _Browser_getUrl(), key);
+			return A3(impl.aQ, flags, _Browser_getUrl(), key);
 		},
-		a1: impl.a1,
 		a0: impl.a0,
-		a_: impl.a_
+		a$: impl.a$,
+		aZ: impl.aZ
 	});
 }
 
@@ -4141,17 +4141,17 @@ var _Browser_decodeEvent = F2(function(decoder, event)
 function _Browser_visibilityInfo()
 {
 	return (typeof _VirtualDom_doc.hidden !== 'undefined')
-		? { aS: 'hidden', aO: 'visibilitychange' }
+		? { aO: 'hidden', aJ: 'visibilitychange' }
 		:
 	(typeof _VirtualDom_doc.mozHidden !== 'undefined')
-		? { aS: 'mozHidden', aO: 'mozvisibilitychange' }
+		? { aO: 'mozHidden', aJ: 'mozvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.msHidden !== 'undefined')
-		? { aS: 'msHidden', aO: 'msvisibilitychange' }
+		? { aO: 'msHidden', aJ: 'msvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.webkitHidden !== 'undefined')
-		? { aS: 'webkitHidden', aO: 'webkitvisibilitychange' }
-		: { aS: 'hidden', aO: 'visibilitychange' };
+		? { aO: 'webkitHidden', aJ: 'webkitvisibilitychange' }
+		: { aO: 'hidden', aJ: 'visibilitychange' };
 }
 
 
@@ -4232,12 +4232,12 @@ var _Browser_call = F2(function(functionName, id)
 function _Browser_getViewport()
 {
 	return {
-		aE: _Browser_getScene(),
-		aH: {
-			aJ: _Browser_window.pageXOffset,
-			aK: _Browser_window.pageYOffset,
-			aI: _Browser_doc.documentElement.clientWidth,
-			aq: _Browser_doc.documentElement.clientHeight
+		az: _Browser_getScene(),
+		aC: {
+			aE: _Browser_window.pageXOffset,
+			aF: _Browser_window.pageYOffset,
+			aD: _Browser_doc.documentElement.clientWidth,
+			al: _Browser_doc.documentElement.clientHeight
 		}
 	};
 }
@@ -4247,8 +4247,8 @@ function _Browser_getScene()
 	var body = _Browser_doc.body;
 	var elem = _Browser_doc.documentElement;
 	return {
-		aI: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
-		aq: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
+		aD: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
+		al: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
 	};
 }
 
@@ -4271,15 +4271,15 @@ function _Browser_getViewportOf(id)
 	return _Browser_withNode(id, function(node)
 	{
 		return {
-			aE: {
-				aI: node.scrollWidth,
-				aq: node.scrollHeight
+			az: {
+				aD: node.scrollWidth,
+				al: node.scrollHeight
 			},
-			aH: {
-				aJ: node.scrollLeft,
-				aK: node.scrollTop,
-				aI: node.clientWidth,
-				aq: node.clientHeight
+			aC: {
+				aE: node.scrollLeft,
+				aF: node.scrollTop,
+				aD: node.clientWidth,
+				al: node.clientHeight
 			}
 		};
 	});
@@ -4309,18 +4309,18 @@ function _Browser_getElement(id)
 		var x = _Browser_window.pageXOffset;
 		var y = _Browser_window.pageYOffset;
 		return {
-			aE: _Browser_getScene(),
-			aH: {
-				aJ: x,
-				aK: y,
-				aI: _Browser_doc.documentElement.clientWidth,
-				aq: _Browser_doc.documentElement.clientHeight
+			az: _Browser_getScene(),
+			aC: {
+				aE: x,
+				aF: y,
+				aD: _Browser_doc.documentElement.clientWidth,
+				al: _Browser_doc.documentElement.clientHeight
 			},
-			aQ: {
-				aJ: x + rect.left,
-				aK: y + rect.top,
-				aI: rect.width,
-				aq: rect.height
+			aM: {
+				aE: x + rect.left,
+				aF: y + rect.top,
+				aD: rect.width,
+				al: rect.height
 			}
 		};
 	});
@@ -4896,7 +4896,7 @@ var $elm$url$Url$Http = 0;
 var $elm$url$Url$Https = 1;
 var $elm$url$Url$Url = F6(
 	function (protocol, host, port_, path, query, fragment) {
-		return {ap: fragment, ar: host, av: path, ax: port_, aA: protocol, aB: query};
+		return {ak: fragment, am: host, aq: path, as: port_, av: protocol, aw: query};
 	});
 var $elm$core$String$contains = _String_contains;
 var $elm$core$String$length = _String_length;
@@ -5175,28 +5175,28 @@ var $elm$core$Task$perform = F2(
 			A2($elm$core$Task$map, toMessage, task));
 	});
 var $elm$browser$Browser$element = _Browser_element;
-var $author$project$Main$computeBalance = function (_v0) {
-	var lastBalance = _v0.u;
-	var deposit = _v0.g;
-	var withdrawal = _v0.j;
-	var interestEarned = _v0.t;
+var $author$project$SingleComputation$computeBalance = function (_v0) {
+	var lastBalance = _v0.o;
+	var deposit = _v0.aK;
+	var withdrawal = _v0.a1;
+	var interestEarned = _v0.aR;
 	return ((lastBalance + deposit) + interestEarned) - withdrawal;
 };
-var $author$project$Main$computeDeposit = F3(
+var $author$project$SingleComputation$computeDeposit = F3(
 	function (age, salary, model) {
-		return (_Utils_cmp(age, model.o) > 0) ? 0 : ((model.F * salary) / 100);
+		return (_Utils_cmp(age, model.D) > 0) ? 0 : ((model.B * salary) / 100);
 	});
-var $author$project$Main$DueAtEndOfPeriod = 1;
+var $author$project$SingleComputation$DueAtEndOfPeriod = 1;
 var $elm$core$Basics$negate = function (n) {
 	return -n;
 };
 var $elm$core$Basics$pow = _Basics_pow;
-var $author$project$Main$futureValue = function (_v0) {
-	var presentValue = _v0.af;
-	var interestRate = _v0.aa;
-	var terms = _v0.D;
-	var payment = _v0.ad;
-	var paymentType = _v0.ae;
+var $author$project$SingleComputation$futureValue = function (_v0) {
+	var presentValue = _v0._;
+	var interestRate = _v0.V;
+	var terms = _v0.v;
+	var payment = _v0.Y;
+	var paymentType = _v0.Z;
 	return (!interestRate) ? (presentValue + (payment * terms)) : (-function () {
 		var compoundedRate = A2($elm$core$Basics$pow, 1 + interestRate, terms);
 		if (!paymentType) {
@@ -5206,76 +5206,76 @@ var $author$project$Main$futureValue = function (_v0) {
 		}
 	}());
 };
-var $author$project$Main$computeInterestEarned = function (_v0) {
-	var lastBalance = _v0.u;
-	var deposit = _v0.g;
-	var withdrawal = _v0.j;
-	var returnPercent = _v0.x;
-	return $author$project$Main$futureValue(
-		{aa: returnPercent / 100, ad: -deposit, ae: 1, af: -(lastBalance - withdrawal), D: 1}) - ((lastBalance + deposit) - withdrawal);
+var $author$project$SingleComputation$computeInterestEarned = function (_v0) {
+	var lastBalance = _v0.o;
+	var deposit = _v0.aK;
+	var withdrawal = _v0.a1;
+	var returnPercent = _v0.aX;
+	return $author$project$SingleComputation$futureValue(
+		{V: returnPercent / 100, Y: -deposit, Z: 1, _: -(lastBalance - withdrawal), v: 1}) - ((lastBalance + deposit) - withdrawal);
 };
-var $author$project$Main$computeCurrentTerm = F2(
+var $author$project$SingleComputation$computeCurrentTerm = F2(
 	function (age, model) {
-		return age - model.s;
+		return age - model.N;
 	});
 var $elm$core$Basics$ge = _Utils_ge;
 var $elm$core$Basics$round = _Basics_round;
-var $author$project$Main$round100 = function (n) {
+var $author$project$Utils$round100 = function (n) {
 	return $elm$core$Basics$round(n * 100) / 100;
 };
-var $author$project$Main$interpolate = function (_v0) {
-	var terms = _v0.D;
-	var currentTerm = _v0.V;
-	var startValue = _v0.Z;
-	var endValue = _v0.W;
-	var round = _v0.X;
-	return (_Utils_cmp(currentTerm, terms) > -1) ? endValue : (round ? $author$project$Main$round100 : $elm$core$Basics$identity)(startValue + ((currentTerm / terms) * (endValue - startValue)));
+var $author$project$SingleComputation$interpolate = function (_v0) {
+	var terms = _v0.v;
+	var currentTerm = _v0.J;
+	var startValue = _v0.T;
+	var endValue = _v0.K;
+	var round = _v0.S;
+	return (_Utils_cmp(currentTerm, terms) > -1) ? endValue : (round ? $author$project$Utils$round100 : $elm$core$Basics$identity)(startValue + ((currentTerm / terms) * (endValue - startValue)));
 };
-var $author$project$Main$computeReturnPercent = F2(
+var $author$project$SingleComputation$computeReturnPercent = F2(
 	function (age, model) {
-		return $author$project$Main$interpolate(
+		return $author$project$SingleComputation$interpolate(
 			{
-				V: A2($author$project$Main$computeCurrentTerm, age, model),
-				W: model.M,
-				X: false,
-				Z: model.H,
-				D: model.L - model.s
+				J: A2($author$project$SingleComputation$computeCurrentTerm, age, model),
+				K: model.M,
+				S: false,
+				T: model.O,
+				v: model.L - model.N
 			});
 	});
-var $author$project$Main$computeSalary = F2(
+var $author$project$SingleComputation$computeSalary = F2(
 	function (age, model) {
-		return (_Utils_cmp(age, model.o) > 0) ? 0 : $author$project$Main$interpolate(
+		return (_Utils_cmp(age, model.D) > 0) ? 0 : $author$project$SingleComputation$interpolate(
 			{
-				V: A2($author$project$Main$computeCurrentTerm, age, model),
-				W: model.P,
-				X: true,
-				Z: model.N,
-				D: model.o - model.s
+				J: A2($author$project$SingleComputation$computeCurrentTerm, age, model),
+				K: model.Q,
+				S: true,
+				T: model.P,
+				v: model.D - model.N
 			});
 	});
-var $author$project$Main$computeWithdrawal = F2(
+var $author$project$SingleComputation$computeWithdrawal = F2(
 	function (age, model) {
-		return (_Utils_cmp(age, model.o) > 0) ? model.Q : 0;
+		return (_Utils_cmp(age, model.D) > 0) ? model.R : 0;
 	});
-var $author$project$Main$finalAge = 100;
-var $author$project$Main$computeHelp = F3(
+var $author$project$SingleComputation$finalAge = 100;
+var $author$project$SingleComputation$computeHelp = F3(
 	function (model, last, rest) {
 		computeHelp:
 		while (true) {
-			if (_Utils_eq(last.z, $author$project$Main$finalAge)) {
+			if (_Utils_eq(last.af, $author$project$SingleComputation$finalAge)) {
 				return $elm$core$List$reverse(
 					A2($elm$core$List$cons, last, rest));
 			} else {
-				var age = last.z + 1;
-				var returnPercent = A2($author$project$Main$computeReturnPercent, age, model);
-				var salary = A2($author$project$Main$computeSalary, age, model);
-				var deposit = A3($author$project$Main$computeDeposit, age, salary, model);
-				var withdrawal = A2($author$project$Main$computeWithdrawal, age, model);
-				var interestEarned = $author$project$Main$computeInterestEarned(
-					{g: deposit, u: last.r, x: returnPercent, j: withdrawal});
-				var balance = $author$project$Main$computeBalance(
-					{g: deposit, t: interestEarned, u: last.r, j: withdrawal});
-				var _new = {z: age, r: balance, g: deposit, t: interestEarned, x: returnPercent, Y: salary, j: withdrawal};
+				var age = last.af + 1;
+				var returnPercent = A2($author$project$SingleComputation$computeReturnPercent, age, model);
+				var salary = A2($author$project$SingleComputation$computeSalary, age, model);
+				var deposit = A3($author$project$SingleComputation$computeDeposit, age, salary, model);
+				var withdrawal = A2($author$project$SingleComputation$computeWithdrawal, age, model);
+				var interestEarned = $author$project$SingleComputation$computeInterestEarned(
+					{aK: deposit, o: last.U, aX: returnPercent, a1: withdrawal});
+				var balance = $author$project$SingleComputation$computeBalance(
+					{aK: deposit, aR: interestEarned, o: last.U, a1: withdrawal});
+				var _new = {af: age, U: balance, aK: deposit, aR: interestEarned, aX: returnPercent, aY: salary, a1: withdrawal};
 				var $temp$model = model,
 					$temp$last = _new,
 					$temp$rest = A2($elm$core$List$cons, last, rest);
@@ -5286,20 +5286,20 @@ var $author$project$Main$computeHelp = F3(
 			}
 		}
 	});
-var $author$project$Main$compute = function (model) {
+var $author$project$SingleComputation$compute = function (model) {
 	var initRow = function () {
-		var returnPercent = model.H;
-		var age = model.s;
-		var salary = A2($author$project$Main$computeSalary, age, model);
-		var deposit = A3($author$project$Main$computeDeposit, age, salary, model);
-		var withdrawal = A2($author$project$Main$computeWithdrawal, age, model);
-		var interestEarned = $author$project$Main$computeInterestEarned(
-			{g: deposit, u: 0, x: returnPercent, j: withdrawal});
-		var balance = $author$project$Main$computeBalance(
-			{g: deposit, t: interestEarned, u: 0, j: withdrawal});
-		return {z: age, r: balance, g: deposit, t: interestEarned, x: returnPercent, Y: salary, j: withdrawal};
+		var returnPercent = model.O;
+		var age = model.N;
+		var salary = A2($author$project$SingleComputation$computeSalary, age, model);
+		var deposit = A3($author$project$SingleComputation$computeDeposit, age, salary, model);
+		var withdrawal = A2($author$project$SingleComputation$computeWithdrawal, age, model);
+		var interestEarned = $author$project$SingleComputation$computeInterestEarned(
+			{aK: deposit, o: 0, aX: returnPercent, a1: withdrawal});
+		var balance = $author$project$SingleComputation$computeBalance(
+			{aK: deposit, aR: interestEarned, o: 0, a1: withdrawal});
+		return {af: age, U: balance, aK: deposit, aR: interestEarned, aX: returnPercent, aY: salary, a1: withdrawal};
 	}();
-	return A3($author$project$Main$computeHelp, model, initRow, _List_Nil);
+	return A3($author$project$SingleComputation$computeHelp, model, initRow, _List_Nil);
 };
 var $author$project$Main$elmToJS = _Platform_outgoingPort('elmToJS', $elm$core$Basics$identity);
 var $gicentre$elm_vegalite$VegaLite$X = 0;
@@ -9723,7 +9723,7 @@ var $author$project$Main$toSpec = F2(
 				'retirement age',
 				$gicentre$elm_vegalite$VegaLite$nums(
 					_List_fromArray(
-						[model.o]))));
+						[model.D]))));
 		var retirementAgeLabel = $gicentre$elm_vegalite$VegaLite$asSpec(
 			_List_fromArray(
 				[
@@ -9767,7 +9767,7 @@ var $author$project$Main$toSpec = F2(
 								_List_fromArray(
 									[
 										'Saving phase:',
-										$elm$core$String$fromFloat(model.F) + '% of salary gets',
+										$elm$core$String$fromFloat(model.B) + '% of salary gets',
 										'deposited every year'
 									]))),
 							$gicentre$elm_vegalite$VegaLite$maAlign($gicentre$elm_vegalite$VegaLite$haRight),
@@ -9787,7 +9787,7 @@ var $author$project$Main$toSpec = F2(
 					$elm_community$list_extra$List$Extra$find,
 					function (_v0) {
 						var row = _v0.b;
-						return row.r < 0;
+						return row.U < 0;
 					},
 					A2($elm$core$List$indexedMap, $elm$core$Tuple$pair, rows))));
 		var filteredRows = A2($elm$core$List$take, firstNegativeRowIndex + 1, rows);
@@ -9836,7 +9836,7 @@ var $author$project$Main$toSpec = F2(
 							A2(
 								$elm$core$Basics$composeR,
 								function ($) {
-									return $.z;
+									return $.af;
 								},
 								$elm$core$Basics$toFloat),
 							filteredRows)))),
@@ -9847,7 +9847,7 @@ var $author$project$Main$toSpec = F2(
 					A2(
 						$elm$core$List$map,
 						function ($) {
-							return $.r;
+							return $.U;
 						},
 						filteredRows))));
 		return $gicentre$elm_vegalite$VegaLite$toVegaLite(
@@ -9873,17 +9873,17 @@ var $author$project$Main$toSpec = F2(
 				]));
 	});
 var $author$project$Main$recompute = function (model) {
-	var computed = $author$project$Main$compute(model);
+	var computed = $author$project$SingleComputation$compute(model);
 	var newModel = _Utils_update(
 		model,
-		{_: computed});
+		{I: computed});
 	return _Utils_Tuple2(
 		newModel,
 		$author$project$Main$elmToJS(
 			A2($author$project$Main$toSpec, newModel, computed)));
 };
 var $author$project$Main$init = function (flags) {
-	var modelWithoutComputed = {_: _List_Nil, F: 10, L: 80, M: 3, s: 27, H: 6, N: (5700 * 20) * 11, o: 65, P: (6000 * 20) * 11, Q: 50000 * 12};
+	var modelWithoutComputed = {I: _List_Nil, B: 10, L: 80, M: 3, N: 27, O: 6, P: (5700 * 20) * 11, D: 65, Q: (6000 * 20) * 11, R: 50000 * 12};
 	return $author$project$Main$recompute(modelWithoutComputed);
 };
 var $elm$core$Platform$Sub$batch = _Platform_batch;
@@ -9926,7 +9926,7 @@ var $author$project$Main$update = F2(
 							function (n) {
 								return _Utils_update(
 									model,
-									{s: n});
+									{N: n});
 							});
 					case 1:
 						var string = msg.a;
@@ -9937,7 +9937,7 @@ var $author$project$Main$update = F2(
 							function (n) {
 								return _Utils_update(
 									model,
-									{o: n});
+									{D: n});
 							});
 					case 2:
 						var string = msg.a;
@@ -9948,7 +9948,7 @@ var $author$project$Main$update = F2(
 							function (n) {
 								return _Utils_update(
 									model,
-									{N: n});
+									{P: n});
 							});
 					case 3:
 						var string = msg.a;
@@ -9959,7 +9959,7 @@ var $author$project$Main$update = F2(
 							function (n) {
 								return _Utils_update(
 									model,
-									{P: n});
+									{Q: n});
 							});
 					case 4:
 						var string = msg.a;
@@ -9970,7 +9970,7 @@ var $author$project$Main$update = F2(
 							function (n) {
 								return _Utils_update(
 									model,
-									{H: n});
+									{O: n});
 							});
 					case 5:
 						var string = msg.a;
@@ -10003,7 +10003,7 @@ var $author$project$Main$update = F2(
 							function (n) {
 								return _Utils_update(
 									model,
-									{F: n});
+									{B: n});
 							});
 					default:
 						var string = msg.a;
@@ -10014,7 +10014,7 @@ var $author$project$Main$update = F2(
 							function (n) {
 								return _Utils_update(
 									model,
-									{Q: n});
+									{R: n});
 							});
 				}
 			}());
@@ -10096,12 +10096,15 @@ var $elm$html$Html$Events$onInput = function (tagger) {
 			A2($elm$json$Json$Decode$map, tagger, $elm$html$Html$Events$targetValue)));
 };
 var $elm$html$Html$Attributes$placeholder = $elm$html$Html$Attributes$stringProperty('placeholder');
+var $elm$html$Html$Attributes$step = function (n) {
+	return A2($elm$html$Html$Attributes$stringProperty, 'step', n);
+};
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
 var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
-var $author$project$Main$input = F6(
-	function (min, max, toString, value, label, toMsg) {
+var $author$project$Main$input = F7(
+	function (min, max, step, toString, value, label, toMsg) {
 		var min_ = toString(min);
 		var max_ = toString(max);
 		return A2(
@@ -10135,6 +10138,8 @@ var $author$project$Main$input = F6(
 									$elm$html$Html$Attributes$type_('number'),
 									$elm$html$Html$Attributes$min(min_),
 									$elm$html$Html$Attributes$max(max_),
+									$elm$html$Html$Attributes$step(
+									toString(step)),
 									$elm$html$Html$Attributes$placeholder(min_ + ('-' + max_)),
 									$elm$html$Html$Attributes$value(
 									toString(value))
@@ -10143,9 +10148,9 @@ var $author$project$Main$input = F6(
 						]))
 				]));
 	});
-var $author$project$Main$ageInput = A3($author$project$Main$input, 0, $author$project$Main$finalAge, $elm$core$String$fromInt);
-var $author$project$Main$moneyInput = A3($author$project$Main$input, 0, 10000000, $elm$core$String$fromFloat);
-var $author$project$Main$percentInput = A3($author$project$Main$input, 0, 100, $elm$core$String$fromFloat);
+var $author$project$Main$ageInput = A4($author$project$Main$input, 0, $author$project$SingleComputation$finalAge, 1, $elm$core$String$fromInt);
+var $author$project$Main$moneyInput = A4($author$project$Main$input, 0, 10000000, 1, $elm$core$String$fromFloat);
+var $author$project$Main$percentInput = A4($author$project$Main$input, 0, 100, 0.01, $elm$core$String$fromFloat);
 var $author$project$Main$viewInputs = function (model) {
 	return A2(
 		$elm$html$Html$div,
@@ -10163,8 +10168,8 @@ var $author$project$Main$viewInputs = function (model) {
 					]),
 				_List_fromArray(
 					[
-						A3($author$project$Main$ageInput, model.s, 'Initial age', $author$project$Main$SetInitialAge),
-						A3($author$project$Main$ageInput, model.o, 'Retirement age', $author$project$Main$SetRetirementAge)
+						A3($author$project$Main$ageInput, model.N, 'Initial age', $author$project$Main$SetInitialAge),
+						A3($author$project$Main$ageInput, model.D, 'Retirement age', $author$project$Main$SetRetirementAge)
 					])),
 				A2(
 				$elm$html$Html$div,
@@ -10174,8 +10179,8 @@ var $author$project$Main$viewInputs = function (model) {
 					]),
 				_List_fromArray(
 					[
-						A3($author$project$Main$moneyInput, model.N, 'Initial salary (p.a.)', $author$project$Main$SetInitialSalary),
-						A3($author$project$Main$moneyInput, model.P, 'Salary before retirement (p.a.)', $author$project$Main$SetRetirementSalary)
+						A3($author$project$Main$moneyInput, model.P, 'Initial salary (p.a.)', $author$project$Main$SetInitialSalary),
+						A3($author$project$Main$moneyInput, model.Q, 'Salary before retirement (p.a.)', $author$project$Main$SetRetirementSalary)
 					])),
 				A2(
 				$elm$html$Html$div,
@@ -10185,7 +10190,7 @@ var $author$project$Main$viewInputs = function (model) {
 					]),
 				_List_fromArray(
 					[
-						A3($author$project$Main$percentInput, model.H, 'Initial return % (p.a.)', $author$project$Main$SetInitialReturnPercent),
+						A3($author$project$Main$percentInput, model.O, 'Initial return % (p.a.)', $author$project$Main$SetInitialReturnPercent),
 						A3($author$project$Main$percentInput, model.M, 'Final return % (p.a.)', $author$project$Main$SetFinalReturnPercent),
 						A3($author$project$Main$ageInput, model.L, 'Final return at age', $author$project$Main$SetFinalReturnAtAge)
 					])),
@@ -10197,8 +10202,8 @@ var $author$project$Main$viewInputs = function (model) {
 					]),
 				_List_fromArray(
 					[
-						A3($author$project$Main$percentInput, model.F, 'Deposit % of salary', $author$project$Main$SetDepositPercent),
-						A3($author$project$Main$moneyInput, model.Q, 'Retirement withdrawal (p.a.)', $author$project$Main$SetRetirementWithdrawal)
+						A3($author$project$Main$percentInput, model.B, 'Deposit % of salary', $author$project$Main$SetDepositPercent),
+						A3($author$project$Main$moneyInput, model.R, 'Retirement withdrawal (p.a.)', $author$project$Main$SetRetirementWithdrawal)
 					]))
 			]));
 };
@@ -10338,7 +10343,7 @@ var $elm$core$String$toList = function (string) {
 };
 var $author$project$Main$formatMoney = function (n) {
 	var stringN = $elm$core$String$fromFloat(
-		$author$project$Main$round100(n));
+		$author$project$Utils$round100(n));
 	var _v0 = function () {
 		var _v1 = A2($elm$core$String$split, $author$project$Main$decimalDot, stringN);
 		_v1$2:
@@ -10390,7 +10395,7 @@ var $author$project$Main$formatMoney = function (n) {
 };
 var $author$project$Main$formatPercent = function (n) {
 	var stringN = $elm$core$String$fromFloat(
-		$author$project$Main$round100(n));
+		$author$project$Utils$round100(n));
 	var _v0 = function () {
 		var _v1 = A2($elm$core$String$split, $author$project$Main$decimalDot, stringN);
 		_v1$2:
@@ -10454,11 +10459,11 @@ var $author$project$Main$viewRow = function (row) {
 				_List_fromArray(
 					[
 						$elm$html$Html$text(
-						$elm$core$String$fromInt(row.z))
+						$elm$core$String$fromInt(row.af))
 					])),
-				formatMoney_(row.Y),
-				formatMoney_(row.g),
-				formatMoney_(row.j),
+				formatMoney_(row.aY),
+				formatMoney_(row.aK),
+				formatMoney_(row.a1),
 				A2(
 				$elm$html$Html$td,
 				_List_fromArray(
@@ -10468,10 +10473,10 @@ var $author$project$Main$viewRow = function (row) {
 				_List_fromArray(
 					[
 						$elm$html$Html$text(
-						$author$project$Main$formatPercent(row.x))
+						$author$project$Main$formatPercent(row.aX))
 					])),
-				formatMoney_(row.t),
-				formatMoney_(row.r)
+				formatMoney_(row.aR),
+				formatMoney_(row.U)
 			]));
 };
 var $author$project$Main$viewTable = function (computed) {
@@ -10557,7 +10562,6 @@ var $author$project$Main$viewTable = function (computed) {
 			]));
 };
 var $author$project$Main$view_ = function (model) {
-	var computed = $author$project$Main$compute(model);
 	return A2(
 		$elm$html$Html$div,
 		_List_fromArray(
@@ -10575,13 +10579,13 @@ var $author$project$Main$view_ = function (model) {
 						$elm$html$Html$Attributes$class('chart')
 					]),
 				_List_Nil),
-				$author$project$Main$viewTable(computed)
+				$author$project$Main$viewTable(model.I)
 			]));
 };
 var $author$project$Main$view = function (model) {
 	return A2($elm$html$Html$Lazy$lazy, $author$project$Main$view_, model);
 };
 var $author$project$Main$main = $elm$browser$Browser$element(
-	{aU: $author$project$Main$init, a_: $author$project$Main$subscriptions, a0: $author$project$Main$update, a1: $author$project$Main$view});
+	{aQ: $author$project$Main$init, aZ: $author$project$Main$subscriptions, a$: $author$project$Main$update, a0: $author$project$Main$view});
 _Platform_export({'Main':{'init':$author$project$Main$main(
 	$elm$json$Json$Decode$succeed(0))(0)}});}(this));
