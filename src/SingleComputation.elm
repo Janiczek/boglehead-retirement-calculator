@@ -315,8 +315,14 @@ sanityCheck model =
         lastsUntilFinalAge =
             lastPositiveAge >= finalAge
 
-        initialGTFinal : Bool
-        initialGTFinal =
+        initialGEFinal : Bool
+        initialGEFinal =
             model.initialReturnPercent >= model.finalReturnPercent
+
+        finalGERetirement : Bool
+        finalGERetirement =
+            model.finalReturnAtAge >= model.retirementAge
     in
-    lastsUntilFinalAge && initialGTFinal
+    lastsUntilFinalAge
+        && initialGEFinal
+        && finalGERetirement

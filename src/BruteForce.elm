@@ -59,7 +59,7 @@ min =
     , dp = 1
     , irp = 5
     , frp = 3
-    , fraa = 27
+    , fraa = 40
     }
 
 
@@ -82,11 +82,11 @@ step =
 
 
 w =
-    { ra = 3
+    { ra = 3.25
     , dp = 1
     , irp = 0.2
     , frp = 0.1
-    , fraa = 0.1
+    , fraa = 0.15
     }
 
 
@@ -121,7 +121,7 @@ type Msg
 
 tries : Int
 tries =
-    10000
+    100000
 
 
 init : () -> ( (), Cmd Msg )
