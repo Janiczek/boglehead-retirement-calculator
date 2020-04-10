@@ -1,9 +1,12 @@
-module BruteForce exposing (Input, main, scalarize)
+port module BruteForce exposing (Input, main, scalarize)
 
 import List.Extra
 import Platform
 import Random exposing (Generator)
 import SingleComputation
+
+
+port elmToJS : Input -> Cmd msg
 
 
 type alias Input =
@@ -13,6 +16,10 @@ type alias Input =
     , finalReturnAtAge : Int
     , depositPercent : Float
     }
+
+
+emptyInput =
+    Input 0 0 0 0 0
 
 
 type alias Model =
@@ -47,120 +54,56 @@ toInput r =
 -- RETIREMENT AGE
 
 
-raMin =
-    27
+min =
+    { ra = 27
+    , dp = 1
+    , irp = 5
+    , frp = 3
+    , fraa = 27
+    }
 
 
-raMax =
-    100
+max =
+    { ra = 100
+    , dp = 50
+    , irp = 10
+    , frp = 6
+    , fraa = 100
+    }
 
 
-raStep =
-    1
+step =
+    { ra = 1
+    , dp = 0.1
+    , irp = 0.1
+    , frp = 0.1
+    , fraa = 1
+    }
 
 
-
--- DEPOSIT PERCENT
-
-
-dpMin =
-    1
-
-
-dpMax =
-    50
-
-
-dpStep =
-    1
-
-
-
--- INITIAL RETURN PERCENT
-
-
-irpMin =
-    5
-
-
-irpMax =
-    10
-
-
-irpStep =
-    0.1
-
-
-
--- FINAL RETURN PERCENT
-
-
-frpMin =
-    3
-
-
-frpMax =
-    6
-
-
-frpStep =
-    0.1
-
-
-
--- FINAL RETURN AT AGE
-
-
-fraaMin =
-    27
-
-
-fraaMax =
-    100
-
-
-fraaStep =
-    1
-
-
-
--- WEIGHTS
-
-
-raWeight =
-    2
-
-
-dpWeight =
-    0.3
-
-
-irpWeight =
-    0.1
-
-
-frpWeight =
-    0.1
-
-
-fraaWeight =
-    0.1
+w =
+    { ra = 3
+    , dp = 1
+    , irp = 0.2
+    , frp = 0.1
+    , fraa = 0.1
+    }
 
 
 {-| Normalize a number in a range into the 0..1 range.
 -}
 normalize : Float -> Float -> Float -> Float
-normalize min max n =
-    (n - min) / (max - min)
+normalize min_ max_ n =
+    (n - min_) / (max_ - min_)
 
 
 scalarize : Input -> Float
 scalarize a =
-    (raWeight * normalize raMin raMax (toFloat a.retirementAge))
-        + (dpWeight * normalize dpMin dpMax a.depositPercent)
-        + (irpWeight * normalize irpMin irpMax a.initialReturnPercent)
-        + (frpWeight * normalize frpMin frpMax a.finalReturnPercent)
-        + (fraaWeight * normalize fraaMin fraaMax (toFloat a.finalReturnAtAge))
+    (w.ra * normalize min.ra max.ra (toFloat a.retirementAge))
+        + (w.dp * normalize min.dp max.dp a.depositPercent)
+        + (w.irp * normalize min.irp max.irp a.initialReturnPercent)
+        + (w.frp * normalize min.frp max.frp a.finalReturnPercent)
+        + (w.fraa * normalize min.fraa max.fraa (toFloat a.finalReturnAtAge))
 
 
 main : Program () () Msg
@@ -192,74 +135,63 @@ inputGenerator : Generator Input
 inputGenerator =
     Random.map5 Input
         -- beware the order
-        (Random.int raMin raMax)
-        (Random.float irpMin irpMax)
-        (Random.float frpMin frpMax)
-        (Random.int fraaMin fraaMax)
-        (Random.float dpMin dpMax)
+        (Random.int min.ra max.ra)
+        (Random.float min.irp max.irp)
+        (Random.float min.frp max.frp)
+        (Random.int min.fraa max.fraa)
+        (Random.float min.dp max.dp)
 
 
 update : Msg -> () -> ( (), Cmd Msg )
 update msg () =
     case msg of
         GeneratedInputs inputs ->
-            let
-                _ =
-                    inputs
-                        |> List.map toModel
-                        |> List.filter SingleComputation.sanityCheck
-                        |> List.map (descendAll >> toInput)
-                        |> List.map (\input -> ( input, scalarize input ))
-                        |> List.Extra.minimumBy Tuple.second
-                        |> Debug.log "best random input"
-            in
-            ( (), Cmd.none )
+            ( ()
+            , inputs
+                |> List.map toModel
+                |> List.filter SingleComputation.sanityCheck
+                |> List.map (descendAll >> toInput)
+                |> List.map (\input -> ( input, scalarize input ))
+                |> List.Extra.minimumBy Tuple.second
+                |> Maybe.map Tuple.first
+                |> Maybe.withDefault emptyInput
+                |> elmToJS
+            )
 
 
-setRA n model =
-    { model | retirementAge = n }
-
-
-setDP n model =
-    { model | depositPercent = n }
-
-
-setIRP n model =
-    { model | initialReturnPercent = n }
-
-
-setFRP n model =
-    { model | finalReturnPercent = n }
-
-
-setFRAA n model =
-    { model | finalReturnAtAge = n }
+set =
+    { ra = \n model -> { model | retirementAge = n }
+    , dp = \n model -> { model | depositPercent = n }
+    , irp = \n model -> { model | initialReturnPercent = n }
+    , frp = \n model -> { model | finalReturnPercent = n }
+    , fraa = \n model -> { model | finalReturnAtAge = n }
+    }
 
 
 descend : number -> number -> (Model -> number) -> (number -> Model -> Model) -> Model -> Model
-descend min step getter setter model =
+descend min_ step_ getter setter model =
     let
         new =
-            getter model - step
+            getter model - step_
 
         newModel =
             setter new model
     in
-    if new < min || not (SingleComputation.sanityCheck newModel) then
+    if new < min_ || not (SingleComputation.sanityCheck newModel) then
         model
 
     else
-        descend min step getter setter newModel
+        descend min_ step_ getter setter newModel
 
 
 descendAll : Model -> Model
 descendAll model =
     model
-        |> descend raMin raStep .retirementAge setRA
-        |> descend dpMin dpStep .depositPercent setDP
-        |> descend irpMin irpStep .initialReturnPercent setIRP
-        |> descend frpMin frpStep .finalReturnPercent setFRP
-        |> descend fraaMin fraaStep .finalReturnAtAge setFRAA
+        |> descend min.ra step.ra .retirementAge set.ra
+        |> descend min.dp step.dp .depositPercent set.dp
+        |> descend min.irp step.irp .initialReturnPercent set.irp
+        |> descend min.frp step.frp .finalReturnPercent set.frp
+        |> descend min.fraa step.fraa .finalReturnAtAge set.fraa
 
 
 subscriptions : () -> Sub Msg
