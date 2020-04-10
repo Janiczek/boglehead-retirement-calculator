@@ -9883,7 +9883,7 @@ var $author$project$Main$recompute = function (model) {
 			A2($author$project$Main$toSpec, newModel, computed)));
 };
 var $author$project$Main$init = function (flags) {
-	var modelWithoutComputed = {I: _List_Nil, B: 10, L: 80, M: 3, N: 27, O: 6, P: (5700 * 20) * 11, D: 65, Q: (6000 * 20) * 11, R: 50000 * 12};
+	var modelWithoutComputed = {I: _List_Nil, B: 10, L: 80, M: 3, N: 27, O: 6, P: (5700 * 20) * 11, D: 65, Q: (5700 * 20) * 11, R: 50000 * 12};
 	return $author$project$Main$recompute(modelWithoutComputed);
 };
 var $elm$core$Platform$Sub$batch = _Platform_batch;
